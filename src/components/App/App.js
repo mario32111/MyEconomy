@@ -1,13 +1,13 @@
 import React from 'react';
-import RatingExample from '../RatingExample'
 import { AppUI } from './AppUI';
-
+import { TodoProvider } from '../TodoContext';
 
 function App() {
+
   return (
-    <div>
+    <TodoProvider>
       <AppUI />
-    </div>
+    </TodoProvider>
   );
 }
 
