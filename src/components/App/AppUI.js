@@ -13,7 +13,6 @@ function AppUI() {
     <div>
       <Navbar></Navbar>
       <Home></Home>
-
     </div>
   );
 }
