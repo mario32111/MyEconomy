@@ -17,7 +17,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import logoBlanco from '../../../assets/img/logos/logoBlanco.png'; // Logo blanco
 
-const Navbar = () => {
+function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [activeButton, setActiveButton] = useState(null);
     const [scrolled, setScrolled] = useState(false); // Estado para manejar el desplazamiento

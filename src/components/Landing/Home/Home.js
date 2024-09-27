@@ -81,38 +81,38 @@ const Icon = styled.i`
   font-size: 3rem;
 `;
 
-const Home = () => {
-  return (
-    <HeroSection>
-      <Heading>
-        Powerful Digital Solutions With GP<span>.</span>
-      </Heading>
-      <SubHeading>We are a team of talented digital marketers</SubHeading>
+export const Home = () => {
+    return (
+        <HeroSection>
+            <Heading>
+                Mejora tu Salud Financiera con MyEconomy<span>.</span>
+            </Heading>
+            <SubHeading>Un conjunto de soluciones digitales que se adapta a tus objetivos financieros, perfectas para individuos y dueños de empresas.</SubHeading>
 
-      <IconContainer>
-        <IconBox>
-          <Icon className="bi bi-binoculars" />
-          <h3><a href="#">Lorem Ipsum</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon className="bi bi-bullseye" />
-          <h3><a href="#">Dolor Sitema</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon className="bi bi-fullscreen-exit" />
-          <h3><a href="#">Sedare Perspiciatis</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon className="bi bi-card-list" />
-          <h3><a href="#">Magni Dolores</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon className="bi bi-gem" />
-          <h3><a href="#">Nemos Enimade</a></h3>
-        </IconBox>
-      </IconContainer>
-    </HeroSection>
-  );
+            <IconContainer>
+                <IconBox>
+                    <Icon className="bi bi-binoculars" />
+                    <h3><a href="#">Monitorizacion te tus ingresos y gastos</a></h3>
+                </IconBox>
+                <IconBox>
+                    <Icon className="bi bi-bullseye" />
+                    <h3><a href="#">IA dedicada a las finanzas</a></h3>
+                </IconBox>
+                <IconBox>
+                    <Icon className="bi bi-fullscreen-exit" />
+                    <h3><a href="#">Inversiones automatizadas</a></h3>
+                </IconBox>
+                <IconBox>
+                    <Icon className="bi bi-card-list" />
+                    <h3><a href="#">Control de suscripciones y servicios</a></h3>
+                </IconBox>
+                <IconBox>
+                    <Icon className="bi bi-gem" />
+                    <h3><a href="#">ver mas .....</a></h3>
+                </IconBox>
+            </IconContainer>
+        </HeroSection>
+    );
 };
 
 export default Home;
