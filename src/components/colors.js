@@ -7,6 +7,7 @@ const colors = {
   AzulGris: "#4C6773",
   GrisClaro: "#849499",
   GrisOscuro: "#7F8B94",
+  Negro: "#000000"
 };
 
 // Creación del tema con los colores definidos
