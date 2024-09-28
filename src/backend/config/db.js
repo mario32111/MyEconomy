@@ -1,11 +1,12 @@
 const mysql = require('mysql2');
 
+// Configura la conexión a la base de datos
 const db = mysql.createConnection({
-    host: 'fdb1034.awardspace.net', // Cambia esto a tu host
-    user: '4472420_myeconomy',      // Cambia esto a tu usuario
-    password: 'hola12345',          // Cambia esto a tu contraseña
-    database: '4472420_myeconomy',  // Cambia esto a tu base de datos
-    port: 3306,
+    host: 'localhost',      // Dirección IP de tu servidor local (localhost)
+    user: 'root',           // Usuario de MySQL por defecto en XAMPP
+    password: '',           // Contraseña vacía por defecto en XAMPP (ajusta si has cambiado la contraseña)
+    database: 'myeconomy',  // Nombre de tu base de datos
+    port: 3306,             // Puerto de MySQL (por defecto es 3306)
 });
 
 // Conectar a la base de datos

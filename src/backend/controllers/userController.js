@@ -1,6 +1,6 @@
-const userModel = require('../models/userModel'); // Asegúrate de que el modelo esté definido
+const userModel = require('../models/userModel'); // Modelo de usuario
 
-// Controlador para crear un nuevo usuario
+// Función para crear un nuevo usuario
 const createUser = async (req, res) => {
     try {
         const userData = req.body; // Obtiene los datos del nuevo usuario del cuerpo de la solicitud
@@ -11,5 +11,24 @@ const createUser = async (req, res) => {
     }
 };
 
-// Exporta las funciones
-module.exports = { createUser };
+// Función para login
+const loginUser = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        // Busca al usuario en la base de datos por email
+        const user = await userModel.findUserByEmail(email);
+
+        if (!user || user.password !== password) {
+            return res.status(401).json({ message: 'Credenciales inválidas' });
+        }
+
+        // Si las credenciales son correctas
+        res.status(200).json({ message: 'Login exitoso', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error en el login', error });
+    }
+};
+
+
+module.exports = { createUser, loginUser };

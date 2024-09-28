@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const userRoutes = require('./routes/userRoutes'); // Asegúrate de que este archivo exista
+const userRoutes = require('./routes/userRoutes'); // Importa las rutas de usuarios
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors()); // Habilita CORS para manejar peticiones desde el frontend
 app.use(express.json()); // Para parsear el cuerpo de las solicitudes en formato JSON
 
 // Rutas
