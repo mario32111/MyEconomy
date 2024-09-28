@@ -44,8 +44,12 @@ const Navbar = () => {
             changePath('/loggin');
         }
         if (index === 'signup') {
-            changePath('/sign-up')
+            changePath('/sign-up');
         }
+    };
+
+    const handleLogoClick = () => {
+        changePath('/'); // Cambia el path al hacer clic en el logo o en el texto
     };
 
     const drawerItems = (
@@ -98,13 +102,13 @@ const Navbar = () => {
                                 </Drawer>
                             </>
                         ) : (
-                            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }} onClick={handleLogoClick}>
                                 <img
                                     src={scrolled ? logoBlanco : logoAzul} // Cambia el logo según el estado
                                     alt="Logo"
-                                    style={{ height: '40px', marginRight: '10px' }} // Ajusta el tamaño
+                                    style={{ height: '40px', marginRight: '10px', cursor: 'pointer' }} // Añadir cursor de puntero
                                 />
-                                <Typography variant="h6" sx={{ color: scrolled ? colors.Blanco : colors.AzulMarino }}>
+                                <Typography variant="h6" sx={{ color: scrolled ? colors.Blanco : colors.AzulMarino, cursor: 'pointer' }} onClick={handleLogoClick}>
                                     MyEconomy
                                 </Typography>
                             </Box>
@@ -194,7 +198,6 @@ const Navbar = () => {
                     </Toolbar>
                 </AppBar>
             </Slide>
-
 
             {/* Añadir un margen superior para evitar que el contenido quede oculto detrás del navbar */}
             <Box sx={{ mt: 8 }} /> {/* Ajusta la altura según el tamaño de tu AppBar */}
