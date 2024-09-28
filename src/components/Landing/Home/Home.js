@@ -6,7 +6,7 @@ import fondo2 from '../../../assets/img/fondo2.jpg'; // Segundo fondo
 import fondo3 from '../../../assets/img/fondo3.jpg'; // Tercer fondo
 import fondo4 from '../../../assets/img/fondo4.jpg'; // Primer fondo
 import fondo5 from '../../../assets/img/fondo5.jpg'; // Segundo fondo
-import { theme, colors } from '../../colors'; // Importa el tema y los colores
+import { colors } from '../../colors'; // Importa el tema y los colores
 
 // Estilos con styled-components
 const HeroSection = styled.section`
@@ -120,23 +120,28 @@ export const Home = () => {
       <IconContainer>
         <IconBox>
           <Icon><FaMoneyCheckAlt /></Icon>
-          <h3><a href="#">Monitorización de tus ingresos y gastos</a></h3>
+          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <a href="#">Monitorización de tus ingresos y gastos</a></h3>
         </IconBox>
         <IconBox>
           <Icon><FaRobot /></Icon>
-          <h3><a href="#">IA dedicada a las finanzas</a></h3>
+          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <a href="#">IA dedicada a las finanzas</a></h3>
         </IconBox>
         <IconBox>
           <Icon><FaCoins /></Icon>
-          <h3><a href="#">Inversiones automatizadas</a></h3>
+          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <a href="#">Inversiones automatizadas</a></h3>
         </IconBox>
         <IconBox>
           <Icon><FaRegListAlt /></Icon>
-          <h3><a href="#">Control de suscripciones y servicios</a></h3>
+          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <a href="#">Control de suscripciones y servicios</a></h3>
         </IconBox>
         <IconBox>
           <Icon><FaArrowCircleRight /></Icon>
-          <h3><a href="#">Ver más ...</a></h3>
+          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <a href="#">Ver más ...</a></h3>
         </IconBox>
       </IconContainer>
     </HeroSection>
