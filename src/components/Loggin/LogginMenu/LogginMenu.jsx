@@ -6,7 +6,7 @@ import { theme, colors } from '../../colors'; // Importar el tema y los colores
 import Background from '../../Background/Background';
 
 
-const Login = () => {
+const LogginMenu = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -107,4 +107,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LogginMenu;

@@ -18,13 +18,15 @@ import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import logoBlanco from '../../../assets/img/logos/logoBlanco.png'; // Logo blanco
 import { TodoContext } from '../../TodoContext';
+import { useNavigation } from '../../../hooks/useNavigation'; // Importa AppRoutes y el hook de navegación
 
 function NavbarHome() {
     const {
         setOpenLoggin,
         setSignUp,
       } = React.useContext(TodoContext)
-    
+    const { changePath } = useNavigation(); // Usa el hook de navegación
+
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [activeButton, setActiveButton] = useState(null);
     const [scrolled, setScrolled] = useState(false); // Estado para manejar el desplazamiento
@@ -42,10 +44,10 @@ function NavbarHome() {
         setActiveButton(index);
         console.log(index)
         if(index=== 'login'){
-            setOpenLoggin(true);
+            changePath('/loggin');
         }
         if(index=== 'signup'){
-            setSignUp(true);
+            changePath('/sign-up')
         }
     };
 

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Container, CssBaseline, Avatar, Grid, Link } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { ThemeProvider } from '@mui/material/styles';
-import { theme, colors } from '../colors'; // Importar el tema y los colores
-import Background from '../Background/Background';
+import { theme, colors } from '../../colors'; // Importar el tema y los colores
+import Background from '../../Background/Background';
 
 const SignUp = () => {
   const [name, setName] = useState('');
