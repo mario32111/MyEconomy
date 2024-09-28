@@ -17,8 +17,13 @@ import { ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import logoAzul from '../../../assets/img/logos/logoAzul.png'; // Logo azul
 import logoBlanco from '../../../assets/img/logos/logoBlanco.png'; // Logo blanco
+import { useNavigation } from '../../../hooks/useNavigation'; // Importa AppRoutes y el hook de navegación
+import Slide from '@mui/material/Slide'; // Importa Grow de Material UI
 
 const Navbar = () => {
+    const { changePath } = useNavigation(); // Usa el hook de navegación
+    const [checked, setChecked] = useState(true); // Estado para el control de la animación
+
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [activeButton, setActiveButton] = useState(null);
     const [scrolled, setScrolled] = useState(false); // Estado para manejar el desplazamiento
@@ -34,6 +39,13 @@ const Navbar = () => {
 
     const handleButtonClick = (index) => {
         setActiveButton(index);
+        console.log(index)
+        if (index === 'login') {
+            changePath('/loggin');
+        }
+        if (index === 'signup') {
+            changePath('/sign-up')
+        }
     };
 
     const drawerItems = (
@@ -67,96 +79,66 @@ const Navbar = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <AppBar position="fixed" sx={{ backgroundColor: scrolled ? colors.AzulMarino : colors.Blanco , transition: 'background-color 0.3s ease', width: '100%', zIndex: 1300 }}>
-                <Toolbar>
-                    {isMobile ? (
-                        <>
-                            <IconButton
-                                edge="start"
-                                color="inherit"
-                                aria-label="menu"
-                                sx={{ mr: 2 }}
-                                onClick={toggleDrawer(true)}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                            <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-                                {drawerItems}
-                            </Drawer>
-                        </>
-                    ) : (
-                        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                            <img
-                                src={scrolled ? logoBlanco : logoAzul} // Cambia el logo según el estado
-                                alt="Logo"
-                                style={{ height: '40px', marginRight: '10px' }} // Ajusta el tamaño
-                            />
-                            <Typography variant="h6" sx={{ color: scrolled ? colors.Blanco : colors.AzulMarino }}>
-                                MyEconomy
-                            </Typography>
+            <Slide in={checked} timeout={500}>
+                <AppBar position="fixed" sx={{ backgroundColor: scrolled ? colors.AzulMarino : colors.Blanco, transition: 'background-color 0.3s ease', width: '100%', zIndex: 1300 }}>
+                    <Toolbar>
+                        {isMobile ? (
+                            <>
+                                <IconButton
+                                    edge="start"
+                                    color="inherit"
+                                    aria-label="menu"
+                                    sx={{ mr: 2 }}
+                                    onClick={toggleDrawer(true)}
+                                >
+                                    <MenuIcon />
+                                </IconButton>
+                                <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
+                                    {drawerItems}
+                                </Drawer>
+                            </>
+                        ) : (
+                            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                                <img
+                                    src={scrolled ? logoBlanco : logoAzul} // Cambia el logo según el estado
+                                    alt="Logo"
+                                    style={{ height: '40px', marginRight: '10px' }} // Ajusta el tamaño
+                                />
+                                <Typography variant="h6" sx={{ color: scrolled ? colors.Blanco : colors.AzulMarino }}>
+                                    MyEconomy
+                                </Typography>
+                            </Box>
+                        )}
+
+                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
+                            {['Inicio', 'Servicios', 'Contacto'].map((text, index) => (
+                                <Button
+                                    key={text}
+                                    sx={{
+                                        color: scrolled ? colors.Blanco : colors.AzulMarino,
+                                        fontWeight: activeButton === index ? 'bold' : 'normal',
+                                        textDecoration: activeButton === index ? 'underline' : 'none',
+                                        '&:hover': {
+                                            fontWeight: 'bold',
+                                        },
+                                    }}
+                                    onClick={() => handleButtonClick(index)}
+                                >
+                                    {text}
+                                </Button>
+                            ))}
                         </Box>
-                    )}
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
-                        {['Inicio', 'Servicios', 'Contacto'].map((text, index) => (
-                            <Button
-                                key={text}
-                                sx={{
-                                    color: scrolled ? colors.Blanco : colors.AzulMarino,
-                                    fontWeight: activeButton === index ? 'bold' : 'normal',
-                                    textDecoration: activeButton === index ? 'underline' : 'none',
-                                    '&:hover': {
-                                        fontWeight: 'bold',
-                                    },
-                                }}
-                                onClick={() => handleButtonClick(index)}
-                            >
-                                {text}
-                            </Button>
-                        ))}
-                    </Box>
-
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
-                        <Button
-                            variant="outlined"
-                            sx={{
-                                color: scrolled ? colors.Blanco : colors.AzulMarino,
-                                borderColor: colors.Blanco,
-                                '&:hover': {
-                                    borderColor: colors.AzulMarino,
-                                    color: colors.AzulMarino,
-                                    backgroundColor: colors.Blanco,
-                                },
-                            }}
-                            onClick={() => handleButtonClick('login')}
-                        >
-                            Iniciar Sesión
-                        </Button>
-                        <Button
-                            variant="contained"
-                            sx={{
-                                backgroundColor: colors.Blanco,
-                                color: colors.AzulMarino,
-                                '&:hover': {
-                                    backgroundColor: colors.BlancoTransparente,
-                                },
-                            }}
-                            onClick={() => handleButtonClick('signup')}
-                        >
-                            Crear Cuenta
-                        </Button>
-                    </Box>
-
-                    {isMobile && (
-                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, padding: 2 }}>
+                        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
                             <Button
                                 variant="outlined"
                                 sx={{
-                                    color: colors.Blanco,
+                                    color: scrolled ? colors.Blanco : colors.AzulMarino,
                                     borderColor: colors.Blanco,
                                     '&:hover': {
-                                        borderColor: colors.Blanco,
-                                        backgroundColor: colors.BlancoTransparente,
+                                        borderColor: colors.AzulMarino,
+                                        color: colors.AzulMarino,
+                                        backgroundColor: colors.Blanco,
                                     },
                                 }}
                                 onClick={() => handleButtonClick('login')}
@@ -169,7 +151,7 @@ const Navbar = () => {
                                     backgroundColor: colors.Blanco,
                                     color: colors.AzulMarino,
                                     '&:hover': {
-                                        backgroundColor: colors.BlancoTransparenteHover,
+                                        backgroundColor: colors.BlancoTransparente,
                                     },
                                 }}
                                 onClick={() => handleButtonClick('signup')}
@@ -177,9 +159,43 @@ const Navbar = () => {
                                 Crear Cuenta
                             </Button>
                         </Box>
-                    )}
-                </Toolbar>
-            </AppBar>
+
+                        {isMobile && (
+                            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, padding: 2 }}>
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        color: colors.Blanco,
+                                        borderColor: colors.Blanco,
+                                        '&:hover': {
+                                            borderColor: colors.Blanco,
+                                            backgroundColor: colors.BlancoTransparente,
+                                        },
+                                    }}
+                                    onClick={() => handleButtonClick('login')}
+                                >
+                                    Iniciar Sesión
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    sx={{
+                                        backgroundColor: colors.Blanco,
+                                        color: colors.AzulMarino,
+                                        '&:hover': {
+                                            backgroundColor: colors.BlancoTransparenteHover,
+                                        },
+                                    }}
+                                    onClick={() => handleButtonClick('signup')}
+                                >
+                                    Crear Cuenta
+                                </Button>
+                            </Box>
+                        )}
+                    </Toolbar>
+                </AppBar>
+            </Slide>
+
+
             {/* Añadir un margen superior para evitar que el contenido quede oculto detrás del navbar */}
             <Box sx={{ mt: 8 }} /> {/* Ajusta la altura según el tamaño de tu AppBar */}
         </ThemeProvider>

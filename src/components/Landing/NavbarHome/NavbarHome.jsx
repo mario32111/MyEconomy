@@ -19,12 +19,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import logoBlanco from '../../../assets/img/logos/logoBlanco.png'; // Logo blanco
 import { TodoContext } from '../../TodoContext';
 import { useNavigation } from '../../../hooks/useNavigation'; // Importa AppRoutes y el hook de navegación
+import Slide from '@mui/material/Slide'; // Importa Grow de Material UI
 
 function NavbarHome() {
-    const {
-        setOpenLoggin,
-        setSignUp,
-      } = React.useContext(TodoContext)
+    const [checked, setChecked] = useState(true); // Estado para el control de la animación
     const { changePath } = useNavigation(); // Usa el hook de navegación
 
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -43,10 +41,10 @@ function NavbarHome() {
     const handleButtonClick = (index) => {
         setActiveButton(index);
         console.log(index)
-        if(index=== 'login'){
+        if (index === 'login') {
             changePath('/loggin');
         }
-        if(index=== 'signup'){
+        if (index === 'signup') {
             changePath('/sign-up')
         }
     };
@@ -82,6 +80,7 @@ function NavbarHome() {
 
     return (
         <ThemeProvider theme={theme}>
+            <Slide in={checked} timeout={1000}>
             <AppBar position="fixed" sx={{ backgroundColor: scrolled ? 'rgba(0, 0, 0, 0.5)' : colors.AzulMarino, transition: 'background-color 0.3s ease', width: '100%', zIndex: 1300 }}>
                 <Toolbar>
                     {isMobile ? (
@@ -201,7 +200,9 @@ function NavbarHome() {
                     )}
 
                 </Toolbar>
-            </AppBar>
+            </AppBar>{/*  */}
+            </Slide>
+
             {/* Añadir un margen superior para evitar que el contenido quede oculto detrás del navbar */}
             <Box sx={{ mt: 8 }} /> {/* Ajusta la altura según el tamaño de tu AppBar */}
         </ThemeProvider>

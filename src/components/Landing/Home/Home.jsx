@@ -7,6 +7,7 @@ import fondo3 from '../../../assets/img/fondo3.jpg'; // Tercer fondo
 import fondo4 from '../../../assets/img/fondo4.jpg'; // Primer fondo
 import fondo5 from '../../../assets/img/fondo5.jpg'; // Segundo fondo
 import { colors } from '../../colors'; // Importa el tema y los colores
+import Grow from '@mui/material/Grow'; // Importa Grow de Material UI
 
 // Estilos con styled-components
 const HeroSection = styled.section`
@@ -97,6 +98,7 @@ const Icon = styled.div`
 
 export const Home = () => {
   const [currentBackground, setCurrentBackground] = useState(0);
+  const [checked, setChecked] = useState(true); // Estado para el control de la animación
 
   // Array de imágenes de fondo
   const backgrounds = [fondo1, fondo2, fondo3, fondo4, fondo5];
@@ -112,37 +114,66 @@ export const Home = () => {
 
   return (
     <HeroSection background={backgrounds[currentBackground]}>
-      <Heading>
-        Mejora tu Salud Financiera con MyEconomy<span>.</span>
-      </Heading>
-      <SubHeading>Un conjunto de soluciones digitales que se adapta a tus objetivos financieros, perfectas para individuos y dueños de empresas.</SubHeading>
+      <Grow in={checked} timeout={1000}>
+        <Heading>
+          Mejora tu Salud Financiera con MyEconomy<span>.</span>
+        </Heading>
+      </Grow>
+      <Grow in={checked} timeout={1000}>
+        <SubHeading>Un conjunto de soluciones digitales que se adapta a tus objetivos financieros, perfectas para individuos y dueños de empresas.</SubHeading>
+      </Grow>
 
       <IconContainer>
-        <IconBox>
-          <Icon><FaMoneyCheckAlt /></Icon>
-          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#">Monitorización de tus ingresos y gastos</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon><FaRobot /></Icon>
-          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#">IA dedicada a las finanzas</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon><FaCoins /></Icon>
-          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#">Inversiones automatizadas</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon><FaRegListAlt /></Icon>
-          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#">Control de suscripciones y servicios</a></h3>
-        </IconBox>
-        <IconBox>
-          <Icon><FaArrowCircleRight /></Icon>
-          <h3>      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#">Ver más ...</a></h3>
-        </IconBox>
+        {/* Aplica la animación Grow en cada IconBox */}
+        <Grow in={checked} timeout={1000}>
+          <IconBox>
+            <Icon><FaMoneyCheckAlt /></Icon>
+            <h3>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a href="#">Monitorización de tus ingresos y gastos</a>
+            </h3>
+          </IconBox>
+        </Grow>
+
+        <Grow in={checked} timeout={1200}>
+          <IconBox>
+            <Icon><FaRobot /></Icon>
+            <h3>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a href="#">IA dedicada a las finanzas</a>
+            </h3>
+          </IconBox>
+        </Grow>
+
+        <Grow in={checked} timeout={1400}>
+          <IconBox>
+            <Icon><FaCoins /></Icon>
+            <h3>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a href="#">Inversiones automatizadas</a>
+            </h3>
+          </IconBox>
+        </Grow>
+
+        <Grow in={checked} timeout={1800}>
+          <IconBox>
+            <Icon><FaRegListAlt /></Icon>
+            <h3>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a href="#">Control de suscripciones y servicios</a>
+            </h3>
+          </IconBox>
+        </Grow>
+
+        <Grow in={checked} timeout={2000}>
+          <IconBox>
+            <Icon><FaArrowCircleRight /></Icon>
+            <h3>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a href="#">Ver más ...</a>
+            </h3>
+          </IconBox>
+        </Grow>
       </IconContainer>
     </HeroSection>
   );
