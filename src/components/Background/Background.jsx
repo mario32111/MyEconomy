@@ -14,7 +14,7 @@ const Background = () => {
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',    // Ajusta el tamaño de la imagen
           backgroundPosition: 'center', // Centra la imagen
-          zIndex: -1,                  // Coloca el fondo detrás de otros elementos
+          zIndex: -1,                  // Coloca el fondo detrás de Otros elementos
           opacity: 1,               // Ajusta la opacidad (valor entre 0 y 1)
           filter: 'blur(8px)',        // Aplica un desenfoque de 5 píxeles
         }}
