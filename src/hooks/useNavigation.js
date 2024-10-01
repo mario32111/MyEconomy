@@ -21,7 +21,7 @@ export const useNavigation = () => {
 // Componente para las rutas de la aplicación
 export const AppRoutes = () => {
     return useRoutes([
-        { path: '/prueba', element: <ChatAI /> },
+        { path: '/prueba', element: <Monitoreo /> },
         { path: '/loggin', element: <Loggin /> },
         { path: '/sign-up', element: <SignUp /> },
         { path: '/', element: <Home /> },
