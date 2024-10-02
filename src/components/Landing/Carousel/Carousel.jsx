@@ -47,6 +47,17 @@ const Carousel = () => {
     return (
         <Box sx={{ width: '100%', maxWidth: 600, margin: 'auto' }}>
             <Paper elevation={3} sx={{ position: 'relative', overflow: 'hidden', backgroundColor: '#121212' }}>
+                <Typography variant="h4" component="div" 
+                sx= {{color: 'white',
+                     position: 'absolute', 
+                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                     marginTop: '12px',
+                     marginLeft: '12px',
+                     padding: '12px',
+                     borderRadius: 1
+                     }}>
+                    Conoce todos nuestros servicios
+                </Typography>
                 <img
                     src={images[activeIndex]}
                     alt={`Slide ${activeIndex + 1}`}
