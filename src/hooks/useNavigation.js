@@ -5,6 +5,7 @@ import SignUp from '../components/SignUp/SignUp';
 import Home from '../components/Landing/Landing';
 import Monitoreo from '../components/Monitoreo/Monitoreo';
 import ChatAI from '../components/ChaiAI/ChatAI';
+import MetasFinancieras from '../components/MetasFinancieras/MetasFinancieras';
 
 
 export const useNavigation = () => {
@@ -21,7 +22,7 @@ export const useNavigation = () => {
 // Componente para las rutas de la aplicación
 export const AppRoutes = () => {
     return useRoutes([
-        { path: '/prueba', element: <Monitoreo /> },
+        { path: '/prueba', element: <MetasFinancieras /> },
         { path: '/loggin', element: <Loggin /> },
         { path: '/sign-up', element: <SignUp /> },
         { path: '/', element: <Home /> },
