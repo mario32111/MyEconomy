@@ -22,9 +22,10 @@ import { useNavigation } from '../../../hooks/useNavigation'; // Importa AppRout
 import Slide from '@mui/material/Slide'; // Importa Grow de Material UI
 
 function NavbarHome() {
+    const {openHome, setOpenHome, openServices, setOpenServices, openContact, setOpenContact} = React.useContext(TodoContext)
+
     const [checked, setChecked] = useState(true); // Estado para el control de la animación
     const { changePath } = useNavigation(); // Usa el hook de navegación
-
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [activeButton, setActiveButton] = useState(null);
     const [scrolled, setScrolled] = useState(false); // Estado para manejar el desplazamiento
@@ -47,6 +48,16 @@ function NavbarHome() {
         if (index === 'signup') {
             changePath('/sign-up')
         }
+        if (index === 0) {
+            setOpenHome(true);
+        }
+        if (index === 1) {
+            setOpenServices(true);
+        }
+        if (index === 2) {
+            setOpenContact(true);
+        }
+        
     };
 
     const drawerItems = (

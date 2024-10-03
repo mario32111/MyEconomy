@@ -45,7 +45,7 @@ const Carousel = () => {
     };
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 600, margin: 'auto' }}>
+        <Box sx={{ width: '100%', maxWidth: 650, margin: 'auto' }}>
             <Paper elevation={3} sx={{ position: 'relative', overflow: 'hidden', backgroundColor: '#121212' }}>
                 <Typography variant="h4" component="div" 
                 sx= {{color: 'white',
