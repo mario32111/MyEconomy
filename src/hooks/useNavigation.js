@@ -7,6 +7,8 @@ import Monitoreo from '../components/Monitoreo/Monitoreo';
 import ChatAI from '../components/ChaiAI/ChatAI';
 import MetasFinancieras from '../components/MetasFinancieras/MetasFinancieras';
 import ControlDeSuscripciones from '../components/ControlDeSuscripciones/ControlDeSuscripciones'
+import Cursos from '../components/Cursos/Cursos';
+import PricingCards from '../components/CrearPlan/CrearPlan'
 
 export const useNavigation = () => {
     const navigate = useNavigate();
@@ -22,7 +24,7 @@ export const useNavigation = () => {
 // Componente para las rutas de la aplicación
 export const AppRoutes = () => {
     return useRoutes([
-        { path: '/prueba', element: <ControlDeSuscripciones /> },
+        { path: '/prueba', element: <PricingCards /> },
         { path: '/loggin', element: <Loggin /> },
         { path: '/sign-up', element: <SignUp /> },
         { path: '/', element: <Home /> },
