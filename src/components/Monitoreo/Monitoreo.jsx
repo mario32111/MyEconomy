@@ -13,8 +13,7 @@ import './Monitoreo.css'; // Asegúrate de crear un archivo CSS o usar estilos e
 
 export default function Monitoreo() {
     return (
-        <>
-            <NavBarPrincipal />
+        <NavBarPrincipal>
             <div className="grafico-container">
                 <GraficaGastos />
                 <GraficaIngresos />
@@ -25,7 +24,6 @@ export default function Monitoreo() {
                 <MetasFinancieras />
                 <EducacionFinanciera />
             </div>
-        </>
-
+        </NavBarPrincipal>
     );
 }

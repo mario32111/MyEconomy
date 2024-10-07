@@ -1,11 +1,11 @@
 import React from 'react';
-import Chat from '../ChaiAI/Chat/Chat';
+import ControlDeSuscripciones from '../Control/ControlDeSuscripciones/ControlDeSuscripciones'
 import NavBarPrincipal from '../NavBarPrincipal/NavBarPrincipal';
 export default function Monitoreo() {
   return (
     <>
       <NavBarPrincipal>
-        <Chat />
+        <ControlDeSuscripciones />
       </NavBarPrincipal>
     </>
   );

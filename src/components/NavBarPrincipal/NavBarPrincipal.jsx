@@ -13,35 +13,61 @@ import {
     CssBaseline,
     Box,
     useTheme,
-    useMediaQuery, // Importa el hook para consultas de medios
+    useMediaQuery,
 } from '@mui/material';
-import { Menu, Inbox, CalendarToday, Archive, Settings, ChevronRight } from '@mui/icons-material';
-import { colors } from '../colors'; // Importa el archivo de tema
-import logoBlanco from '../../assets/img/logos/logoBlanco.png'; // Logo blanco
+import {
+    Home,
+    Chat,
+    Build,
+    School,
+    TrendingUp,
+    MonitorHeart,
+    SupportAgent,
+    Percent,
+    Savings,
+    Settings,
+    Menu,
+    ChevronRight,
+} from '@mui/icons-material';
+
+import { colors } from '../colors';
+import logoBlanco from '../../assets/img/logos/logoBlanco.png';
+import { useNavigation } from '../../hooks/useNavigation';
 
 const drawerWidth = 240;
 
-const NavBarPrincipal = () => {
+const NavBarPrincipal = ({ children }) => {
+    const [selectedItem, setSelectedItem] = useState('Inicio'); // Establecer "Inicio" como valor predeterminado
+    const { changePath } = useNavigation();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const theme = useTheme(); // Utiliza el tema importado
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Consulta para detectar vista móvil
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const handleMenuItemClick = (item) => {
+        setSelectedItem(item.text); // Cambia el texto del encabezado
+        changePath(item.path); // Cambia la ruta
+    };
 
     const handleDrawerToggle = () => {
         setIsDrawerOpen(!isDrawerOpen);
     };
 
     const menuItems = [
-        { text: 'Inicio', icon: <Inbox /> },
-        { text: 'Calendario', icon: <CalendarToday /> },
-        { text: 'Cursos en los que te has inscrito', icon: <Inbox /> },
-        { text: 'Clases archivadas', icon: <Archive /> },
-        { text: 'Ajustes', icon: <Settings /> },
+        { text: 'Inicio', icon: <Home />, path: '/' },
+        { text: 'ChatAI', icon: <Chat />, path: '/chatai' },
+        { text: 'Control de servicios', icon: <Build />, path: '/control' },
+        { text: 'Cursos', icon: <School />, path: '/cursos' },
+        { text: 'Metas financieras', icon: <TrendingUp />, path: '/metas-financieras' },
+        { text: 'Monitoreo', icon: <MonitorHeart />, path: '/monitoreo' },
+        { text: 'Soporte', icon: <SupportAgent />, path: '/soporte' },
+        { text: 'Comparacion de tasas de interes', icon: <Percent />, path: '/comparacion-tasas' },
+        { text: 'Sistema de ahorro', icon: <Savings />, path: '/sistema-ahorro' },
+        { text: 'Ajustes', icon: <Settings />, path: '/ajustes' },
     ];
 
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            {/* Barra superior */}
             <AppBar
                 position="fixed"
                 sx={{
@@ -60,11 +86,11 @@ const NavBarPrincipal = () => {
                     </IconButton>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <img
-                            src={logoBlanco} // Cambia el logo según el estado
+                            src={logoBlanco}
                             alt="Logo"
-                            style={{ height: '40px', marginRight: '10px', cursor: 'pointer' }} // Añadir cursor de puntero
+                            style={{ height: '40px', marginRight: '10px', cursor: 'pointer' }}
                         />
-                        {!isMobile && ( // Condicional para ocultar el texto en vista móvil
+                        {!isMobile && (
                             <Typography variant="h6" sx={{ color: colors.Blanco, cursor: 'pointer' }}>
                                 MyEconomy
                             </Typography>
@@ -72,12 +98,11 @@ const NavBarPrincipal = () => {
                         <ChevronRight sx={{ color: colors.Blanco, marginLeft: 1 }} />
                     </Box>
                     <Typography variant="h6" noWrap component="div" sx={{ color: colors.Blanco }}>
-                        Monitoreo
+                        {selectedItem} {/* Mostrar el texto seleccionado aquí */}
                     </Typography>
                 </Toolbar>
             </AppBar>
 
-            {/* Cajón lateral */}
             <Drawer
                 variant="temporary"
                 open={isDrawerOpen}
@@ -94,7 +119,7 @@ const NavBarPrincipal = () => {
                 <Divider />
                 <List>
                     {menuItems.map((item, index) => (
-                        <ListItem button key={index}>
+                        <ListItem button key={index} onClick={() => handleMenuItemClick(item)}>
                             <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
                                 {item.icon}
                             </ListItemIcon>
@@ -106,6 +131,19 @@ const NavBarPrincipal = () => {
                     ))}
                 </List>
             </Drawer>
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    padding: 3,
+                    marginTop: 8,
+                    backgroundColor: colors.Blanco,
+                    color: theme.palette.text.primary,
+                }}
+            >
+                <Toolbar />
+                {children}
+            </Box>
         </Box>
     );
 };

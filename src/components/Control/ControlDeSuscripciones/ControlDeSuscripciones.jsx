@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { ThemeProvider } from '@mui/material/styles';
-import { theme } from '../colors';
+import { theme } from '../../colors';
 
 const servicesInitial = [
   { 
