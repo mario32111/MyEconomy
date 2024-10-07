@@ -9,6 +9,7 @@ import MetasFinancieras from '../components/MetasFinancieras/MetasFinancieras';
 import ControlDeSuscripciones from '../components/ControlDeSuscripciones/ControlDeSuscripciones'
 import Cursos from '../components/Cursos/Cursos';
 import PricingCards from '../components/CrearPlan/CrearPlan'
+import NavBarPrincipal from '../components/NavBarPrincipal/NavBarPrincipal'
 
 export const useNavigation = () => {
     const navigate = useNavigate();
@@ -24,7 +25,7 @@ export const useNavigation = () => {
 // Componente para las rutas de la aplicación
 export const AppRoutes = () => {
     return useRoutes([
-        { path: '/prueba', element: <PricingCards /> },
+        { path: '/prueba', element: <MetasFinancieras /> },
         { path: '/loggin', element: <Loggin /> },
         { path: '/sign-up', element: <SignUp /> },
         { path: '/', element: <Home /> },

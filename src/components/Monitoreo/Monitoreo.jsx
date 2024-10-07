@@ -7,22 +7,25 @@ import GraficaPresupuesto from './GraficaPresupuesto/GraficaPresupuesto';
 import ResumenFinanciero from './ResumenFinanciero/ResumenFinanciero';
 import MetasFinancieras from './MetasFinancieras/MetasFinancieras';
 import EducacionFinanciera from './EducacionFinanciera/EducacionFinanciera';
-
+import NavBarPrincipal from '../NavBarPrincipal/NavBarPrincipal';
 
 import './Monitoreo.css'; // Asegúrate de crear un archivo CSS o usar estilos en línea
 
 export default function Monitoreo() {
     return (
-        <div className="grafico-container">
-            <GraficaGastos />
-            <GraficaIngresos />
-            <GraficaAhorros />
-            <GraficaDeudas />
-            <GraficaPresupuesto />
-            <ResumenFinanciero />
-            <MetasFinancieras />
-            <EducacionFinanciera />
+        <>
+            <NavBarPrincipal />
+            <div className="grafico-container">
+                <GraficaGastos />
+                <GraficaIngresos />
+                <GraficaAhorros />
+                <GraficaDeudas />
+                <GraficaPresupuesto />
+                <ResumenFinanciero />
+                <MetasFinancieras />
+                <EducacionFinanciera />
+            </div>
+        </>
 
-        </div>
     );
 }
