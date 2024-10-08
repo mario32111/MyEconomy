@@ -26,8 +26,8 @@ import {
     Percent,
     Savings,
     Settings,
-    Menu,
-    ChevronRight,
+    Menu,          
+    ChevronRight,  
 } from '@mui/icons-material';
 
 import { colors } from '../colors';
@@ -37,17 +37,18 @@ import { useNavigation } from '../../hooks/useNavigation';
 const drawerWidth = 240;
 
 const NavBarPrincipal = ({ children }) => {
-    const [selectedItem, setSelectedItem] = useState('Inicio'); // Establecer "Inicio" como valor predeterminado
-    const { changePath } = useNavigation();
+    const [selectedItem, setSelectedItem] = useState('ChatAI');   
+    const { changePath } = useNavigation(); 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleMenuItemClick = (item) => {
+        console.log("sadada",item)
         setSelectedItem(item.text); // Cambia el texto del encabezado
         changePath(item.path); // Cambia la ruta
     };
-
+    
     const handleDrawerToggle = () => {
         setIsDrawerOpen(!isDrawerOpen);
     };
@@ -98,7 +99,7 @@ const NavBarPrincipal = ({ children }) => {
                         <ChevronRight sx={{ color: colors.Blanco, marginLeft: 1 }} />
                     </Box>
                     <Typography variant="h6" noWrap component="div" sx={{ color: colors.Blanco }}>
-                        {selectedItem} {/* Mostrar el texto seleccionado aquí */}
+                        {selectedItem}
                     </Typography>
                 </Toolbar>
             </AppBar>
@@ -119,7 +120,7 @@ const NavBarPrincipal = ({ children }) => {
                 <Divider />
                 <List>
                     {menuItems.map((item, index) => (
-                        <ListItem button key={index} onClick={() => handleMenuItemClick(item)}>
+                        <a key={index} onClick={() => handleMenuItemClick(item)}>
                             <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
                                 {item.icon}
                             </ListItemIcon>
@@ -127,7 +128,7 @@ const NavBarPrincipal = ({ children }) => {
                                 primary={item.text}
                                 sx={{ color: theme.palette.text.primary }}
                             />
-                        </ListItem>
+                        </a>
                     ))}
                 </List>
             </Drawer>
