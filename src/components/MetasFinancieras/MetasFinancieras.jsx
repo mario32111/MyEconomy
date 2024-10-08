@@ -6,15 +6,12 @@ import NavBarPrincipal from '../NavBarPrincipal/NavBarPrincipal';
 
 export default function MetasFinancieras() {
     return (
-        <>
-            <NavBarPrincipal>
-                <>
-                    <Calculadora />
-                    <PlanificadorDeAhorros />
-                    <RecordatoriosSeguimiento />
-                </>
-            </NavBarPrincipal>
 
+        <>
+            <Calculadora />
+            <PlanificadorDeAhorros />
+            <RecordatoriosSeguimiento />
         </>
+
     );
 }

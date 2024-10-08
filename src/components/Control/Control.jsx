@@ -4,9 +4,7 @@ import NavBarPrincipal from '../NavBarPrincipal/NavBarPrincipal';
 export default function Monitoreo() {
   return (
     <>
-      <NavBarPrincipal>
         <ControlDeSuscripciones />
-      </NavBarPrincipal>
     </>
   );
 }
