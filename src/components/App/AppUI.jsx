@@ -9,8 +9,8 @@ function AppUI() {
     // Condiciona el renderizado basado en la ruta
     return (
         <>
-            {location.pathname === '/' ? (
-                <AppRoutes /> // Si la ruta es '/', renderiza solo las rutas
+            {location.pathname === '/' || location.pathname === '/loggin' || location.pathname === '/sign-up' ? (
+                <AppRoutes /> // Si la ruta es '/', '/loggin' o '/sign-up', renderiza solo las rutas
             ) : (
                 <NavBarPrincipal>
                     <AppRoutes /> {/* Renderiza las rutas dentro de NavBarPrincipal */}
