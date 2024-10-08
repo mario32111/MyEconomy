@@ -120,7 +120,7 @@ const NavBarPrincipal = ({ children }) => {
                 <Divider />
                 <List>
                     {menuItems.map((item, index) => (
-                        <a key={index} onClick={() => handleMenuItemClick(item)}>
+                        <ListItem button key={index} onClick={() => handleMenuItemClick(item)}>
                             <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
                                 {item.icon}
                             </ListItemIcon>
@@ -128,7 +128,7 @@ const NavBarPrincipal = ({ children }) => {
                                 primary={item.text}
                                 sx={{ color: theme.palette.text.primary }}
                             />
-                        </a>
+                        </ListItem>
                     ))}
                 </List>
             </Drawer>
