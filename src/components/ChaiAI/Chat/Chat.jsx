@@ -65,8 +65,7 @@ const Chat = () => {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          height: '95vh',
-          padding: 2,
+          height: '80vh',
           backgroundColor: theme.palette.background.default,
         }}
       >

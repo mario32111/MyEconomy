@@ -5,9 +5,12 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme, colors } from '../../colors'; // Importar el tema y los colores
 import Background from '../../Background/Background';
 import Slide from '@mui/material/Slide'; // Importa Grow de Material UI
+import { useNavigation } from '../../../hooks/useNavigation'; // Importa AppRoutes y el hook de navegación
 
 
 const LogginMenu = () => {
+  const { changePath } = useNavigation(); // Usa el hook de navegación
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [checked, setChecked] = useState(true); // Estado para el control de la animación
@@ -16,6 +19,7 @@ const LogginMenu = () => {
     event.preventDefault();
     console.log('Email:', email);
     console.log('Password:', password);
+    changePath('/chatai');
     // Aquí iría la lógica para enviar el login a un backend o servicio
   };
 
