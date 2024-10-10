@@ -29,86 +29,97 @@ const LogginMenu = () => {
         <Background />
         <CssBaseline />
         <Slide in={checked} timeout={500}>
-            <Box
-              sx={{
-                marginTop: 16,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                backgroundColor: colors.Blanco, // Color de fondo
-                padding: 3,
-                borderRadius: 2,
-                boxShadow: '0 0 15px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <Avatar sx={{ m: 1, bgcolor: colors.AzulGris }}>
-                <LockOutlinedIcon />
-              </Avatar>
-              <Typography component="h1" variant="h5" color="textPrimary">
+          <Box
+            sx={{
+              marginTop: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              backgroundColor: colors.Blanco, // Color de fondo
+              padding: 3,
+              borderRadius: 2,
+              boxShadow: '0 0 15px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: colors.AzulGris }}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5" color="textPrimary">
+              Iniciar Sesión
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Correo Electrónico"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                InputLabelProps={{ style: { color: colors.GrisOscuro } }} // Color de la etiqueta
+                sx={{
+                  '& .MuiInputBase-input': { color: colors.GrisOscuro }, // Color del texto
+                }}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Contraseña"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                InputLabelProps={{ style: { color: colors.GrisOscuro } }} // Color de la etiqueta
+                sx={{
+                  '& .MuiInputBase-input': { color: colors.GrisOscuro }, // Color del texto
+                }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  backgroundColor: colors.AzulMarino, // Color del botón
+                  '&:hover': {
+                    backgroundColor: colors.AzulGris, // Color al hacer hover
+                  },
+                }}
+              >
                 Iniciar Sesión
-              </Typography>
-              <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Correo Electrónico"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  InputLabelProps={{ style: { color: colors.GrisOscuro } }} // Color de la etiqueta
-                  sx={{
-                    '& .MuiInputBase-input': { color: colors.GrisOscuro }, // Color del texto
-                  }}
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Contraseña"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  InputLabelProps={{ style: { color: colors.GrisOscuro } }} // Color de la etiqueta
-                  sx={{
-                    '& .MuiInputBase-input': { color: colors.GrisOscuro }, // Color del texto
-                  }}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{
-                    mt: 3,
-                    mb: 2,
-                    backgroundColor: colors.AzulMarino, // Color del botón
-                    '&:hover': {
-                      backgroundColor: colors.AzulGris, // Color al hacer hover
-                    },
-                  }}
-                >
-                  Iniciar Sesión
-                </Button>
-                <Grid container>
-                  <Grid item xs>
-                    <Link href="#" variant="body2" sx={{ color: colors.GrisOscuro }}>
-                      ¿Olvidaste tu contraseña?
-                    </Link>
-                  </Grid>
-                  <Grid item>
-                    <Link href="#" variant="body2" sx={{ color: colors.GrisOscuro }}>
-                      {"¿No tienes una cuenta? Regístrate"}
-                    </Link>
-                  </Grid>
+              </Button>
+              <Grid container>
+                <Grid item xs>
+                  <Link style={{ cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.preventDefault(); // Evita la navegación predeterminada del enlace
+                      changePath('/no-password');
+                    }} variant="body2" sx={{ color: colors.GrisOscuro }} variant="body2" sx={{ color: colors.GrisOscuro }}>
+                    ¿Olvidaste tu contraseña?
+                  </Link>
                 </Grid>
-              </Box>
+                <Grid item>
+                  <Link
+                    style={{ cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.preventDefault(); // Evita la navegación predeterminada del enlace
+                      changePath('/sign-up');
+                    }}
+                    style={{ cursor: 'pointer', color: colors.GrisOscuro }}
+                  >
+                    ¿No tienes una cuenta? Regístrate
+                  </Link>
+                </Grid>
+              </Grid>
             </Box>
+          </Box>
         </Slide>
 
       </Container>

@@ -42,7 +42,7 @@ import { useNavigation } from '../../hooks/useNavigation';
 
 const drawerWidth = 240;
 
-const NavBarPrincipal = ({ children }) => {
+const NavBarPrincipal = ({ children, footer }) => {
     const [selectedItem, setSelectedItem] = useState('ChatAI');
     const { changePath } = useNavigation();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -109,7 +109,7 @@ const NavBarPrincipal = ({ children }) => {
         { text: 'Simulador de compras', icon: <ShoppingCart />, path: '/simulador-compras' },
         { text: 'Soporte', icon: <SupportAgent />, path: '/soporte' },
         { text: 'Ajustes', icon: <Settings />, path: '/ajustes' },
-        { text: 'Landing', icon: <Home />, path: '/' },
+        { text: 'Cerrar sesion', icon: <Home />, path: '/' },
     ];
 
     return (
@@ -226,6 +226,8 @@ const NavBarPrincipal = ({ children }) => {
                 <Toolbar />
                 {children}
             </Box>
+            {footer}
+
         </Box>
     );
 };
