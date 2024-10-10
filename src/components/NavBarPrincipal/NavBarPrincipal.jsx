@@ -217,7 +217,7 @@ const NavBarPrincipal = ({ children, footer }) => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    padding: 3,
+                    padding: 0,
                     marginTop: 5,
                     backgroundColor: colors.Blanco,
                     color: theme.palette.text.primary,
@@ -225,8 +225,8 @@ const NavBarPrincipal = ({ children, footer }) => {
             >
                 <Toolbar />
                 {children}
+                {footer}
             </Box>
-            {footer}
 
         </Box>
     );

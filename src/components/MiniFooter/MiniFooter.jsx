@@ -6,8 +6,6 @@ const MiniFooter = () => {
   return (
     <Box
       sx={{
-        position: 'absolute',
-        top: 'calc(100vh)', // Calcula el 100% de la altura de la pantalla menos 100px
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
