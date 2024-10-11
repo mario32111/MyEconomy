@@ -10,6 +10,8 @@ import Cursos from '../components/Cursos/Cursos';
 import PricingCards from '../components/CrearPlan/CrearPlan';
 import NavBarPrincipal from '../components/NavBarPrincipal/NavBarPrincipal';
 import CrearPlan from '../components/CrearPlan/CrearPlan';
+import ForgotPassword from '../components/ContraOlvidada/ContraOlvidada';
+import ResetPassword from '../components/NewPassword/NewPassword';
 
 export const useNavigation = () => {
     const navigate = useNavigate();
@@ -36,5 +38,8 @@ export const AppRoutes = () => {
         { path: '/crear-plan', element: <CrearPlan /> },
         { path: '/pricing-cards', element: <PricingCards /> },
         { path: '/navbar-principal', element: <NavBarPrincipal /> },
+        { path: '/no-password', element: <ForgotPassword /> },
+        { path: '/new-password', element: <ResetPassword /> },
+
     ]);
 };
