@@ -1,0 +1,13 @@
+.grafico-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los gráficos se muevan a la siguiente línea */
+    justify-content: center; /* Centra los gráficos horizontalmente */
+    gap: 20px; /* Espacio entre gráficos */
+    background-color: #EAf0f1;
+}
+
+.grafico-container > * {
+    flex: 1 1 300px; /* Cada gráfico ocupa un espacio igual y mínimo de 300px */
+    max-width: 500px; /* Limita el ancho máximo de cada gráfico */
+    box-sizing: border-box; /* Incluye padding y border en el cálculo del ancho */
+}

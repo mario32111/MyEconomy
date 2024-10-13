@@ -5,8 +5,11 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme, colors } from '../../colors'; // Importar el tema y los colores
 import Background from '../../Background/Background';
 import Slide from '@mui/material/Slide'; // Importa Grow de Material UI
+import { useNavigation } from '../../../hooks/useNavigation'; // Importa AppRoutes y el hook de navegación
+
 
 const SignUp = () => {
+  const { changePath } = useNavigation(); // Usa el hook de navegación
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -130,7 +133,12 @@ const SignUp = () => {
               </Button>
               <Grid container>
                 <Grid item>
-                  <Link href="#" variant="body2" sx={{ color: colors.GrisOscuro }}>
+                  <Link
+                    style={{ cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.preventDefault(); // Evita la navegación predeterminada del enlace
+                      changePath('/loggin');
+                    }} variant="body2" sx={{ color: colors.GrisOscuro }}>
                     {"¿Ya tienes una cuenta? Iniciar sesión"}
                   </Link>
                 </Grid>

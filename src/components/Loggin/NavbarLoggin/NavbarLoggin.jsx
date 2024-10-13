@@ -90,9 +90,11 @@ const Navbar = () => {
                             <>
                                 <IconButton
                                     edge="start"
-                                    color="inherit"
                                     aria-label="menu"
-                                    sx={{ mr: 2 }}
+                                    sx={{ 
+                                        mr: 2, 
+                                        color: colors.AzulMarino  // Cambia el color a Azul Marino
+                                    }}
                                     onClick={toggleDrawer(true)}
                                 >
                                     <MenuIcon />
@@ -169,8 +171,8 @@ const Navbar = () => {
                                 <Button
                                     variant="outlined"
                                     sx={{
-                                        color: colors.Blanco,
-                                        borderColor: colors.Blanco,
+                                        color: colors.AzulMarino,
+                                        borderColor: colors.AzulMarino,
                                         '&:hover': {
                                             borderColor: colors.Blanco,
                                             backgroundColor: colors.BlancoTransparente,

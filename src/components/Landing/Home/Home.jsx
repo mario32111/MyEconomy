@@ -4,8 +4,8 @@ import { FaMoneyCheckAlt, FaRobot, FaCoins, FaRegListAlt, FaArrowCircleRight } f
 import fondo1 from '../../../assets/img/fondo1.jpg'; // Primer fondo
 import fondo2 from '../../../assets/img/fondo2.jpg'; // Segundo fondo
 import fondo3 from '../../../assets/img/fondo3.jpg'; // Tercer fondo
-import fondo4 from '../../../assets/img/fondo4.jpg'; // Primer fondo
-import fondo5 from '../../../assets/img/fondo5.jpg'; // Segundo fondo
+import fondo4 from '../../../assets/img/fondo4.jpg'; // Cuarto fondo
+import fondo5 from '../../../assets/img/fondo5.jpg'; // Quinto fondo
 import { colors } from '../../colors'; // Importa el tema y los colores
 import Grow from '@mui/material/Grow'; // Importa Grow de Material UI
 
@@ -28,6 +28,7 @@ const HeroSection = styled.section`
     background-image: url(${props => props.background});
     background-size: cover;
     background-position: center;
+    background-attachment: fixed; // Efecto parallax
     top: 0;
     left: 0;
     right: 0;
@@ -98,6 +99,7 @@ const Icon = styled.div`
 
 export const Home = () => {
   const [currentBackground, setCurrentBackground] = useState(0);
+  const [scrollY, setScrollY] = useState(0); // Controla el desplazamiento del scroll
   const [checked, setChecked] = useState(true); // Estado para el control de la animación
 
   // Array de imágenes de fondo
@@ -112,8 +114,18 @@ export const Home = () => {
     return () => clearInterval(interval); // Limpiar el intervalo al desmontar
   }, [backgrounds.length]);
 
+  // Escucha el desplazamiento del scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY); // Actualiza el estado con el scroll actual
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <HeroSection background={backgrounds[currentBackground]}>
+    <HeroSection background={backgrounds[currentBackground]} style={{ backgroundPositionY: scrollY * 0.5 }}>
       <Grow in={checked} timeout={1000}>
         <Heading>
           Mejora tu Salud Financiera con MyEconomy<span>.</span>
