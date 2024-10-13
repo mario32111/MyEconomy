@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/static/css/main.7e172f35.css",
+    "main.js": "/static/js/main.297cd413.js",
+    "static/media/fondo4.jpg": "/static/media/fondo4.68030d5914b97fd7cece.jpg",
+    "static/media/fondo2.jpg": "/static/media/fondo2.456e21165eb63d5dfe03.jpg",
+    "static/media/servicio4.jpg": "/static/media/servicio4.66d0492c883c6601efbb.jpg",
+    "static/media/servicio3.jpg": "/static/media/servicio3.4d5512ab87d9f220f8dc.jpg",
+    "static/media/servicio1.jpg": "/static/media/servicio1.2c1a867e0cd44744a6e9.jpg",
+    "static/media/servicio2.jpg": "/static/media/servicio2.374cf391f8f89e1f79d3.jpg",
+    "static/media/servicio8.jpg": "/static/media/servicio8.1b487df779bd8f791113.jpg",
+    "static/media/servicio5.jpg": "/static/media/servicio5.7ffb843bddbec549a015.jpg",
+    "static/media/servicio7.jpg": "/static/media/servicio7.e8ef9bf56ac9ad59fb3e.jpg",
+    "static/media/servicio6.jpg": "/static/media/servicio6.635d6534edc29242d919.jpg",
+    "static/media/fondo1.jpg": "/static/media/fondo1.c766fa0650ba93a89409.jpg",
+    "static/media/logoAzul.png": "/static/media/logoAzul.71687d1dc94f278ae558.png",
+    "static/media/fondo5.jpg": "/static/media/fondo5.0bc761586b62004c5b7a.jpg",
+    "static/media/fondo3.jpg": "/static/media/fondo3.78a30abe4a8b99606b80.jpg",
+    "static/media/logoBlanco.png": "/static/media/logoBlanco.00086503b13c5455e582.png",
+    "index.html": "/index.html",
+    "main.7e172f35.css.map": "/static/css/main.7e172f35.css.map",
+    "main.297cd413.js.map": "/static/js/main.297cd413.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7e172f35.css",
+    "static/js/main.297cd413.js"
+  ]
+}
