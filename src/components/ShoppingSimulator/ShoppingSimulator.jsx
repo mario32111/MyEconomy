@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Button, Card, CardContent, CardActions, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Typography, Grid, Button, Card, CardContent, CardActions, TextField, List, ListItem, ListItemText, FormControl, Select, MenuItem } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-import { theme } from '../colors'; // Importa el tema desde el archivo que has configurado
-
-// Datos de productos simulados
-const products = [
-    { id: 1, name: 'Producto 1', price: 100 },
-    { id: 2, name: 'Producto 2', price: 150 },
-    { id: 3, name: 'Producto 3', price: 200 },
-    { id: 4, name: 'Producto 4', price: 250 },
-];
+import { theme } from '../colors'; // Importa el tema desde tu archivo de configuración
 
 const ShoppingSimulator = () => {
     const [cart, setCart] = useState([]);
     const [total, setTotal] = useState(0);
+    const [productName, setProductName] = useState('');
+    const [productPrice, setProductPrice] = useState('');
+    const [taxRate, setTaxRate] = useState(0);
 
-    // Función para agregar productos al carrito
-    const addToCart = (product) => {
-        setCart([...cart, product]);
-        setTotal(total + product.price);
+    // Función para agregar productos personalizados al carrito
+    const addToCart = () => {
+        if (productName && productPrice) {
+            const price = parseFloat(productPrice);
+            const taxAmount = (price * taxRate) / 100;
+            const totalPrice = price + taxAmount;
+            const product = { id: cart.length + 1, name: productName, price: totalPrice, basePrice: price, taxRate: taxRate };
+            
+            setCart([...cart, product]);
+            setTotal(total + totalPrice);
+            setProductName('');
+            setProductPrice('');
+            setTaxRate(0);
+        }
     };
 
     // Función para eliminar productos del carrito
@@ -46,29 +51,44 @@ const ShoppingSimulator = () => {
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                         <Typography variant="h6" color="secondary" gutterBottom>
-                            Productos Disponibles
+                            Ingresar Detalles del Producto
                         </Typography>
-                        {products.map((product) => (
-                            <Card key={product.id} sx={{ marginBottom: '10px' }}>
-                                <CardContent>
-                                    <Typography variant="h6" color="text.primary">
-                                        {product.name}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Precio: ${product.price}
-                                    </Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => addToCart(product)}
-                                    >
-                                        Agregar al Carrito
-                                    </Button>
-                                </CardActions>
-                            </Card>
-                        ))}
+                        <TextField
+                            label="Nombre del Producto"
+                            value={productName}
+                            onChange={(e) => setProductName(e.target.value)}
+                            fullWidth
+                            margin="normal"
+                        />
+                        <TextField
+                            label="Precio del Producto"
+                            type="number"
+                            value={productPrice}
+                            onChange={(e) => setProductPrice(e.target.value)}
+                            fullWidth
+                            margin="normal"
+                        />
+                        <FormControl fullWidth margin="normal">
+                            <Select
+                                value={taxRate}
+                                onChange={(e) => setTaxRate(e.target.value)}
+                                displayEmpty
+                            >
+                                <MenuItem value={0}>Sin Impuesto</MenuItem>
+                                <MenuItem value={5}>IVA 5%</MenuItem>
+                                <MenuItem value={10}>IVA 10%</MenuItem>
+                                <MenuItem value={16}>IVA 16%</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={addToCart}
+                            fullWidth
+                            sx={{ marginTop: '10px' }}
+                        >
+                            Agregar al Carrito
+                        </Button>
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <Typography variant="h6" color="secondary" gutterBottom>
@@ -83,8 +103,8 @@ const ShoppingSimulator = () => {
                                 cart.map((item, index) => (
                                     <ListItem key={index} divider>
                                         <ListItemText
-                                            primary={item.name}
-                                            secondary={`$${item.price}`}
+                                            primary={`${item.name} (Impuesto: ${item.taxRate}%)`}
+                                            secondary={`Precio: $${item.basePrice} + Impuesto: $${(item.basePrice * item.taxRate / 100).toFixed(2)} = $${item.price.toFixed(2)}`}
                                         />
                                         <Button
                                             size="small"
@@ -98,7 +118,7 @@ const ShoppingSimulator = () => {
                             )}
                         </List>
                         <Typography variant="h6" color="primary" sx={{ marginTop: '20px' }}>
-                            Total: ${total}
+                            Total: ${total.toFixed(2)}
                         </Typography>
                     </Grid>
                 </Grid>

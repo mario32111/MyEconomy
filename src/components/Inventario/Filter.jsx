@@ -7,7 +7,7 @@ const Filter = ({ filter, setFilter }) => {
   return (
     <ThemeProvider theme={theme}>
       <TextField
-        label="Filtrar Productos"
+        label="Buscar"
         fullWidth
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
