@@ -12,6 +12,11 @@ import NavBarPrincipal from '../components/NavBarPrincipal/NavBarPrincipal';
 import CrearPlan from '../components/CrearPlan/CrearPlan';
 import ForgotPassword from '../components/ContraOlvidada/ContraOlvidada';
 import ResetPassword from '../components/NewPassword/NewPassword';
+import HomePage from '../components/HomePage/HomePage';
+import SettingsSection from '../components/Settings/Settings';
+import ShoppingSimulator from '../components/ShoppingSimulator/ShoppingSimulator';
+import SupportSection from '../components/SupportSection/SupportSection';
+import InventoryApp from '../components/Inventario/InventoryApp';
 
 export const useNavigation = () => {
     const navigate = useNavigate();
@@ -27,6 +32,12 @@ export const useNavigation = () => {
 // Componente para las rutas de la aplicación
 export const AppRoutes = () => {
     return useRoutes([
+        { path: '/prueba', element: <InventoryApp /> },
+        { path: '/inventario', element: <InventoryApp /> },
+        { path: '/soporte', element: <SupportSection /> },
+        { path: '/simulador-compras', element: <ShoppingSimulator /> },
+        { path: '/ajustes', element: <SettingsSection /> },
+        { path: '/Home', element: <HomePage /> },
         { path: '/chatai', element: <ChatAI /> },
         { path: '/monitoreo', element: <Monitoreo /> },
         { path: '/loggin', element: <Loggin /> },
