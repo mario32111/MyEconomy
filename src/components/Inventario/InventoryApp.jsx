@@ -1,11 +1,10 @@
-// InventoryApp.js
 import React, { useState } from 'react';
 import ProductForm from './ProductForm';
 import CategoryForm from './CategoryForm';
 import ProductList from './ProductList';
 import Filter from './Filter';
-import { Container, Typography, ThemeProvider } from '@mui/material';
-import { theme } from '../colors'; // Importa el tema desde el archivo que has configurado
+import { Container, Typography, ThemeProvider, Grow, Slide } from '@mui/material';
+import { theme } from '../colors';
 
 const InventoryApp = () => {
   const [products, setProducts] = useState([]);
@@ -27,13 +26,43 @@ const InventoryApp = () => {
   return (
     <ThemeProvider theme={theme}>
       <Container>
-        <Typography variant="h4" gutterBottom>
-          Sistema Gestor de Inventario
-        </Typography>
-        <CategoryForm addCategory={addCategory} />
-        <ProductForm categories={categories} addProduct={addProduct} />
-        <Filter filter={filter} setFilter={setFilter} />
-        <ProductList products={filteredProducts} />
+        <Grow in={true} timeout={1000}>
+          <Typography variant="h4" gutterBottom>
+            Sistema Gestor de Inventario
+          </Typography>
+        </Grow>
+
+        <Grow in={true} timeout={1000}>
+          <Slide direction="left" in={true} timeout={1000}>
+            <div>
+              <CategoryForm addCategory={addCategory} />
+            </div>
+          </Slide>
+        </Grow>
+
+        <Grow in={true} timeout={1000}>
+          <Slide direction="left" in={true} timeout={1000}>
+            <div>
+              <ProductForm categories={categories} addProduct={addProduct} />
+            </div>
+          </Slide>
+        </Grow>
+
+        <Grow in={true} timeout={1000}>
+          <Slide direction="left" in={true} timeout={1000}>
+            <div>
+              <Filter filter={filter} setFilter={setFilter} />
+            </div>
+          </Slide>
+        </Grow>
+
+        <Grow in={true} timeout={1000}>
+          <Slide direction="left" in={true} timeout={1000}>
+            <div>
+              <ProductList products={filteredProducts} />
+            </div>
+          </Slide>
+        </Grow>
       </Container>
     </ThemeProvider>
   );

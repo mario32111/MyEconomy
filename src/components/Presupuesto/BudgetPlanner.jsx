@@ -4,6 +4,8 @@ import { Container, Typography, TextField, Button, Box, Paper, Alert, CircularPr
 import { BarChart } from '@mui/x-charts/BarChart';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../colors';
+import { Grow, Slide } from '@mui/material';
+
 
 const BudgetPlanner = () => {
   const [categories, setCategories] = useState([]);
@@ -50,55 +52,67 @@ const BudgetPlanner = () => {
       setLoadingTips(false);
     }
   };
+  const [checked, setChecked] = useState(true); // Estado para el control de la animación
+
 
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Typography variant="h4" gutterBottom color="primary">
-          Planificador de Presupuesto
-        </Typography>
+        <Grow in={checked} timeout={1000}>
+          <Typography variant="h4" gutterBottom color="primary">
+            Planificador de Presupuesto
+          </Typography>
+        </Grow>
+
 
         {/* Ingresar los ingresos mensuales */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
-            Definir Ingresos Mensuales
-          </Typography>
-          <TextField
-            fullWidth
-            label="Ingresos Mensuales"
-            variant="outlined"
-            type="number"
-            value={monthlyIncome}
-            onChange={(e) => setMonthlyIncome(e.target.value)}
-          />
-        </Paper>
 
-        {/* Formulario para agregar categorías */}
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
-            Agregar Nueva Categoría de Gasto
-          </Typography>
-          <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', gap: 2 }}>
+        <Slide in={checked} timeout={500}>
+          <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+            <Typography variant="h6" gutterBottom color="text.primary">
+              Definir Ingresos Mensuales
+            </Typography>
             <TextField
               fullWidth
-              label="Nombre de la Categoría"
-              variant="outlined"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
-            />
-            <TextField
-              fullWidth
-              label="Monto"
+              label="Ingresos Mensuales"
               variant="outlined"
               type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              value={monthlyIncome}
+              onChange={(e) => setMonthlyIncome(e.target.value)}
             />
-            <Button variant="contained" color="primary" onClick={handleAddCategory}>
-              Agregar
-            </Button>
-          </Box>
-        </Paper>
+          </Paper>
+
+        </Slide>
+
+        {/* Formulario para agregar categorías */}
+        <Slide in={checked} timeout={500}>
+          <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+            <Typography variant="h6" gutterBottom color="text.primary">
+              Agregar Nueva Categoría de Gasto
+            </Typography>
+            <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                fullWidth
+                label="Nombre de la Categoría"
+                variant="outlined"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+              />
+              <TextField
+                fullWidth
+                label="Monto"
+                variant="outlined"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <Button variant="contained" color="primary" onClick={handleAddCategory}>
+                Agregar
+              </Button>
+            </Box>
+          </Paper>
+        </Slide>
+
 
         {/* Alerta de advertencia si el presupuesto total supera los ingresos */}
         {warning && (
@@ -122,33 +136,39 @@ const BudgetPlanner = () => {
         )}
 
         {/* Mostrar el presupuesto total */}
-        <Typography variant="h6" gutterBottom color="text.primary" sx={{ mt: 4 }}>
-          Presupuesto Total: ${totalBudget.toFixed(2)}
-        </Typography>
+        <Grow in={checked} timeout={1000}>
+          <Typography variant="h6" gutterBottom color="text.primary" sx={{ mt: 4 }}>
+            Presupuesto Total: ${totalBudget.toFixed(2)}
+          </Typography>
+        </Grow>
+
 
         {/* Apartado de Tips de IA */}
-        <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
-            Tips de Presupuesto
-          </Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={fetchTipsFromAI}
-            disabled={loadingTips}
-          >
-            {loadingTips ? <CircularProgress size={24} /> : 'Obtener Tips'}
-          </Button>
-          <Box sx={{ mt: 2 }}>
-            {tips.length > 0 && (
-              <ul>
-                {tips.map((tip, index) => (
-                  <li key={index}>{tip}</li>
-                ))}
-              </ul>
-            )}
-          </Box>
-        </Paper>
+        <Slide in={checked} timeout={1000}>
+          <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
+            <Typography variant="h6" gutterBottom color="text.primary">
+              Tips de Presupuesto
+            </Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={fetchTipsFromAI}
+              disabled={loadingTips}
+            >
+              {loadingTips ? <CircularProgress size={24} /> : 'Obtener Tips'}
+            </Button>
+            <Box sx={{ mt: 2 }}>
+              {tips.length > 0 && (
+                <ul>
+                  {tips.map((tip, index) => (
+                    <li key={index}>{tip}</li>
+                  ))}
+                </ul>
+              )}
+            </Box>
+          </Paper>
+        </Slide>
+
       </Container>
     </ThemeProvider>
   );
