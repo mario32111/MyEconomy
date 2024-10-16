@@ -206,13 +206,28 @@ const NavBarPrincipal = ({ children, footer }) => {
                             horizontal: 'right',
                         }}
                     >
-                        <MenuItem onClick={handleUserMenuClose}>
+                        <MenuItem onClick={
+                            () => {
+                                handleUserMenuClose();
+                                changePath('/Ajustes');
+                            }
+                        }>
                             <ListItemText primary="Perfil" />
                         </MenuItem>
-                        <MenuItem onClick={handleUserMenuClose}>
+                        <MenuItem onClick={
+                            () => {
+                                handleUserMenuClose();
+                                changePath('/Ajustes');
+                            }
+                        }>
                             <ListItemText primary="Ajustes" />
                         </MenuItem>
-                        <MenuItem onClick={handleUserMenuClose}>
+                        <MenuItem onClick={
+                            () => {
+                                handleUserMenuClose();
+                                changePath('/');
+                            }
+                            }>
                             <ListItemText primary="Cerrar sesión" />
                         </MenuItem>
                     </Menu>
@@ -258,7 +273,7 @@ const NavBarPrincipal = ({ children, footer }) => {
             >
                 <Toolbar />
                 {children}
-{/*                 {footer}
+                {/*                 {footer}
  */}            </Box>
         </Box>
     );
