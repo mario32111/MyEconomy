@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/MyEconomy/static/css/main.7e172f35.css",
-    "main.js": "/MyEconomy/static/js/main.ac19a1fc.js",
+    "main.js": "/MyEconomy/static/js/main.eb6524bb.js",
     "static/media/fondo4.jpg": "/MyEconomy/static/media/fondo4.68030d5914b97fd7cece.jpg",
     "static/media/fondo2.jpg": "/MyEconomy/static/media/fondo2.456e21165eb63d5dfe03.jpg",
     "static/media/servicio4.jpg": "/MyEconomy/static/media/servicio4.66d0492c883c6601efbb.jpg",
@@ -19,10 +19,10 @@
     "static/media/logoBlanco.png": "/MyEconomy/static/media/logoBlanco.00086503b13c5455e582.png",
     "index.html": "/MyEconomy/index.html",
     "main.7e172f35.css.map": "/MyEconomy/static/css/main.7e172f35.css.map",
-    "main.ac19a1fc.js.map": "/MyEconomy/static/js/main.ac19a1fc.js.map"
+    "main.eb6524bb.js.map": "/MyEconomy/static/js/main.eb6524bb.js.map"
   },
   "entrypoints": [
     "static/css/main.7e172f35.css",
-    "static/js/main.ac19a1fc.js"
+    "static/js/main.eb6524bb.js"
   ]
 }
