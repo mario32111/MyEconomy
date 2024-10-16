@@ -40,6 +40,8 @@ import {
     LocalAtm,
     ShoppingCart,
 } from '@mui/icons-material';
+import Slide from '@mui/material/Slide'; // Importa Grow de Material UI
+
 
 import { colors } from '../colors';
 import logoBlanco from '../../assets/img/logos/logoBlanco.png';
@@ -106,133 +108,137 @@ const NavBarPrincipal = ({ children, footer }) => {
         { id: 4, text: 'Hemos lanzado: Curso de Product Marketing', date: 'Hace 15 días', type: 'new', icon: <Announcement /> },
         { id: 5, text: 'Hemos lanzado: Curso de Inglés Básico A1 para Principiantes', date: 'Hace 22 días', type: 'new', icon: <Announcement /> },
     ];
+    const [checked, setChecked] = useState(true); // Estado para el control de la animación
 
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar
-                position="fixed"
-                sx={{
-                    zIndex: theme.zIndex.drawer + 1,
-                    backgroundColor: colors.AzulMarino,
-                }}
-            >
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        edge="start"
-                        onClick={handleDrawerToggle}
-                        sx={{ marginRight: 2 }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {!isMobile && (
-                            <>
-                                <img
-                                    onClick={() => changePath('/Home')}
-                                    src={logoBlanco}
-                                    alt="Logo"
-                                    style={{ height: '40px', marginRight: '10px', cursor: 'pointer' }}
-                                />
-                                <Typography variant="h6" sx={{ color: colors.Blanco, cursor: 'pointer' }}>
-                                    MyEconomy
-                                </Typography>
-                                <ChevronRight onClick={() => changePath('/Home')} sx={{ color: colors.Blanco, marginLeft: 1 }} />
 
-                            </>
-                        )}
-                    </Box>
-                    <Typography variant="h6" noWrap component="div" sx={{ color: colors.Blanco, flexGrow: 1 }}>
-                        {selectedItem}
-                    </Typography>
-                    <IconButton
-                        color="inherit"
-                        onClick={handleNotificationMenuOpen}
-                    >
-                        <Notifications />
-                    </IconButton>
-                    <Popover
-                        anchorEl={notificationAnchorEl}
-                        open={Boolean(notificationAnchorEl)}
-                        onClose={handleNotificationMenuClose}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        sx={{ padding: 1 }}
-                    >
-                        <Box sx={{ width: 300 }}>
-                            <List>
-                                {notifications.map((notification) => (
-                                    <ListItem key={notification.id} sx={{ borderBottom: '1px solid #ccc', padding: 1 }}>
-                                        <ListItemIcon>
-                                            {notification.icon}
-                                        </ListItemIcon>
-                                        <ListItemText
-                                            primary={notification.text}
-                                            secondary={notification.date}
-                                        />
-                                        {notification.comment && (
-                                            <Typography variant="body2" color="textSecondary">
-                                                {notification.comment}
-                                            </Typography>
-                                        )}
-                                    </ListItem>
-                                ))}
-                            </List>
+            <Slide in={checked} timeout={500}>
+
+                <AppBar
+                    position="fixed"
+                    sx={{
+                        zIndex: theme.zIndex.drawer + 1,
+                        backgroundColor: colors.AzulMarino,
+                    }}
+                >
+                    <Toolbar>
+                        <IconButton
+                            color="inherit"
+                            edge="start"
+                            onClick={handleDrawerToggle}
+                            sx={{ marginRight: 2 }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {!isMobile && (
+                                <>
+                                    <img
+                                        onClick={() => changePath('/Home')}
+                                        src={logoBlanco}
+                                        alt="Logo"
+                                        style={{ height: '40px', marginRight: '10px', cursor: 'pointer' }}
+                                    />
+                                    <Typography onClick={() => changePath('/Home')} variant="h6" sx={{ color: colors.Blanco, cursor: 'pointer' }}>
+                                        MyEconomy
+                                    </Typography>
+                                    <ChevronRight onClick={() => changePath('/Home')} sx={{ color: colors.Blanco, marginLeft: 1 }} />
+                                </>
+                            )}
                         </Box>
-                    </Popover>
-                    <IconButton
-                        color="inherit"
-                        onClick={handleUserMenuOpen}
-                    >
-                        <AccountCircle />
-                    </IconButton>
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleUserMenuClose}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                    >
-                        <MenuItem onClick={
-                            () => {
-                                handleUserMenuClose();
-                                changePath('/Ajustes');
-                            }
-                        }>
-                            <ListItemText primary="Perfil" />
-                        </MenuItem>
-                        <MenuItem onClick={
-                            () => {
-                                handleUserMenuClose();
-                                changePath('/Ajustes');
-                            }
-                        }>
-                            <ListItemText primary="Ajustes" />
-                        </MenuItem>
-                        <MenuItem onClick={
-                            () => {
-                                handleUserMenuClose();
-                                changePath('/');
-                            }
+                        <Typography variant="h6" noWrap component="div" sx={{ color: colors.Blanco, flexGrow: 1 }}>
+                            {selectedItem}
+                        </Typography>
+                        <IconButton
+                            color="inherit"
+                            onClick={handleNotificationMenuOpen}
+                        >
+                            <Notifications />
+                        </IconButton>
+                        <Popover
+                            anchorEl={notificationAnchorEl}
+                            open={Boolean(notificationAnchorEl)}
+                            onClose={handleNotificationMenuClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            sx={{ padding: 1 }}
+                        >
+                            <Box sx={{ width: 300 }}>
+                                <List>
+                                    {notifications.map((notification) => (
+                                        <ListItem key={notification.id} sx={{ borderBottom: '1px solid #ccc', padding: 1 }}>
+                                            <ListItemIcon>
+                                                {notification.icon}
+                                            </ListItemIcon>
+                                            <ListItemText
+                                                primary={notification.text}
+                                                secondary={notification.date}
+                                            />
+                                            {notification.comment && (
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {notification.comment}
+                                                </Typography>
+                                            )}
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Box>
+                        </Popover>
+                        <IconButton
+                            color="inherit"
+                            onClick={handleUserMenuOpen}
+                        >
+                            <AccountCircle />
+                        </IconButton>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleUserMenuClose}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                        >
+                            <MenuItem onClick={
+                                () => {
+                                    handleUserMenuClose();
+                                    changePath('/Ajustes');
+                                }
                             }>
-                            <ListItemText primary="Cerrar sesión" />
-                        </MenuItem>
-                    </Menu>
-                </Toolbar>
-            </AppBar>
+                                <ListItemText primary="Perfil" />
+                            </MenuItem>
+                            <MenuItem onClick={
+                                () => {
+                                    handleUserMenuClose();
+                                    changePath('/Ajustes');
+                                }
+                            }>
+                                <ListItemText primary="Ajustes" />
+                            </MenuItem>
+                            <MenuItem onClick={
+                                () => {
+                                    handleUserMenuClose();
+                                    changePath('/');
+                                }
+                            }>
+                                <ListItemText primary="Cerrar sesión" />
+                            </MenuItem>
+                        </Menu>
+                    </Toolbar>
+                </AppBar>
+            </Slide>
 
             <Drawer
                 variant="temporary"
@@ -276,6 +282,8 @@ const NavBarPrincipal = ({ children, footer }) => {
                 {/*                 {footer}
  */}            </Box>
         </Box>
+
+
     );
 };
 
