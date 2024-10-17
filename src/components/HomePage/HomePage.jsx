@@ -1,14 +1,36 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Button, Card, CardContent, Grow, Slide } from '@mui/material';
+import {
+    Box,
+    Typography,
+    Grid,
+    Button,
+    Card,
+    CardContent,
+    Grow,
+    Slide,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper
+} from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { theme } from '../colors'; // Importa el tema desde el archivo que has configurado
 
-const HomePage = () => {
-    const [checked, setChecked] = useState(true); // Estado para el control de la animación
-    const navigate = useNavigate(); // Hook para la navegación
+const transactions = [
+    { date: '03/08/2024', type: 'Gasto', description: 'Suministros de oficina', amount: 250 },
+    { date: '04/08/2024', type: 'Ingreso', description: 'Ventas tienda en línea', amount: 150 },
+    { date: '05/08/2024', type: 'Gasto', description: 'Servicios públicos oficina', amount: 350 },
+    { date: '06/08/2024', type: 'Gasto', description: 'Suministros', amount: 25 },
+];
 
-    // Mapeo de funciones a sus paths
+const HomePage = () => {
+    const [checked, setChecked] = useState(true);
+    const navigate = useNavigate();
+
     const functionsMap = {
         'ChatAI': '/chatai',
         'Control de Servicios': '/control',
@@ -24,23 +46,64 @@ const HomePage = () => {
     };
 
     const handleButtonClick = (path) => {
-        navigate(path); // Navegar a la ruta especificada
+        navigate(path);
     };
 
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ padding: { xs: '10px', md: '20px' }, backgroundColor: theme.palette.background.default }}>
-                {/* Bienvenida */}
                 <Slide direction="right" in={checked} timeout={500}>
                     <Typography variant="h4" color="primary" gutterBottom>
                         Hola, [Nombre de Usuario]
                     </Typography>
                 </Slide>
-                <Slide direction="right" in={checked} timeout={500}>
+{/*                 <Slide direction="right" in={checked} timeout={500}>
                     <Typography variant="subtitle1" color="text.secondary">
                         Aquí tienes un resumen de tu estado financiero esta semana.
                     </Typography>
+                </Slide> */}
+
+                {/* Tabla de Resumen de Transacciones */}
+
+                <Slide direction="right" in={checked} timeout={500}>
+                    <Box sx={{ marginTop: '30px' }}>
+                        <Typography variant="h5" color="primary" gutterBottom>
+                            Resumen financiero de la semana
+                        </Typography>
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Fecha</TableCell>
+                                        <TableCell>Tipo</TableCell>
+                                        <TableCell>Descripción</TableCell>
+                                        <TableCell align="right">Monto</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {transactions.map((transaction, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>{transaction.date}</TableCell>
+                                            <TableCell>{transaction.type}</TableCell>
+                                            <TableCell>{transaction.description}</TableCell>
+                                            <TableCell align="right">${transaction.amount.toFixed(2)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <Box sx={{ marginTop: '20px', textAlign: 'center' }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => handleButtonClick('/monitoreo')}
+                            >
+                                Ver más detalles
+                            </Button>
+                        </Box>
+                    </Box>
                 </Slide>
+
 
                 {/* Acceso Rápido a Funciones */}
                 <Box sx={{ marginTop: '30px' }}>
@@ -51,15 +114,15 @@ const HomePage = () => {
                         {Object.keys(functionsMap).map((funcion, index) => (
                             <Grid
                                 item
-                                xs={12} // Toma todo el ancho en pantallas muy pequeñas
-                                sm={6} // Toma la mitad del ancho en pantallas pequeñas
-                                md={4} // Toma un tercio del ancho en pantallas medianas
-                                lg={3} // Toma un cuarto del ancho en pantallas grandes
+                                xs={12}
+                                sm={6}
+                                md={4}
+                                lg={3}
                                 key={index}
                             >
                                 <Grow
                                     in={true}
-                                    timeout={index * 250 + 500} // Ajusta el delay para cada botón
+                                    timeout={index * 250 + 500}
                                 >
                                     <Button
                                         variant="contained"
@@ -115,7 +178,7 @@ const HomePage = () => {
                     </Slide>
                 </Box>
             </Box>
-        </ThemeProvider >
+        </ThemeProvider>
     );
 };
 
