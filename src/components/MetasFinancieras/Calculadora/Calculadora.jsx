@@ -38,11 +38,11 @@ const Calculadora = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="sm" style={{ marginTop: '20px' }}>
-        <Typography variant="h4" color="text.primary" gutterBottom>
+      <Container maxWidth="sm" style={{ marginTop: '20px', padding: '0 16px' }}>
+        <Typography variant="h4" color="text.primary" gutterBottom align="center">
           Calculadora de Metas Financieras
         </Typography>
-        
+
         <TextField
           label="Meta (Ej. Comprar una casa)"
           variant="outlined"
@@ -51,7 +51,7 @@ const Calculadora = () => {
           onChange={(e) => setMeta(e.target.value)}
           style={{ marginBottom: '20px' }}
         />
-        
+
         <TextField
           label="Monto Deseado"
           variant="outlined"
@@ -61,7 +61,7 @@ const Calculadora = () => {
           onChange={(e) => setMontoDeseado(e.target.value)}
           style={{ marginBottom: '20px' }}
         />
-        
+
         <TextField
           label="Plazo (en meses)"
           variant="outlined"
@@ -77,7 +77,7 @@ const Calculadora = () => {
           <MenuItem value={36}>3 años</MenuItem>
           <MenuItem value={60}>5 años</MenuItem>
         </TextField>
-        
+
         <Button
           variant="contained"
           color="primary"
@@ -90,18 +90,18 @@ const Calculadora = () => {
 
         {resultadoMensual !== null && (
           <>
-            <Typography variant="h6" color="text.primary" gutterBottom>
+            <Typography variant="h6" color="text.primary" gutterBottom align="center">
               Necesitas ahorrar: ${resultadoMensual.toFixed(2)} mensualmente
             </Typography>
 
-            <Box style={{ marginTop: '20px' }}>
+            <Box style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h6" color="text.primary" gutterBottom>
                 Progreso de Ahorro
               </Typography>
 
               {progresoDatos && progresoDatos.length > 0 && (
                 <LineChart
-                  width={600}
+                  width={600} // Puedes usar un ancho porcentual si prefieres
                   height={400}
                   dataset={progresoDatos}
                   series={[
@@ -113,15 +113,12 @@ const Calculadora = () => {
                     },
                   ]}
                   xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-                  yAxis={[
-                    {
-                      label: 'Ahorros ($)',
-                    },
-                  ]}
+                  yAxis={[{ label: 'Ahorros ($)' }]}
                   sx={{
                     [`.${axisClasses.left} .${axisClasses.label}`]: {
                       transform: 'translate(-20px, 0)',
                     },
+                    maxWidth: '100%', // Asegúrate de que el gráfico se adapte al contenedor
                   }}
                 />
               )}
