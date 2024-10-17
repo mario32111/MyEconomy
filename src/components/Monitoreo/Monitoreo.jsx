@@ -18,9 +18,7 @@ const components = {
     GraficaAhorros,
     GraficaDeudas,
     GraficaPresupuesto,
-    ResumenFinanciero,
-    MetasFinancieras,
-    EducacionFinanciera
+
 };
 
 export default function Monitoreo() {
@@ -65,9 +63,17 @@ export default function Monitoreo() {
                     <Grow in={true} timeout={1000}>
                         <div style={{ minWidth: '300px', width: '100%' }}> {/* Limita el ancho máximo para responsividad */}
                             <SelectedComponent />
+                            <div style={{ display:"flex", justifyContent:"center", flexDirection:"column", maxWidth: '300px', width: '100%', margin: '0 auto'}}>
+                                <ResumenFinanciero />
+                                <MetasFinancieras />
+                                <EducacionFinanciera />
+                            </div>
+
                         </div>
+
                     </Grow>
                 </Box>
+
             </Box>
         </ThemeProvider>
     );
