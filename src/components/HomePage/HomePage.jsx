@@ -14,21 +14,34 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Paper
+    Paper,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField
 } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { theme } from '../colors'; // Importa el tema desde el archivo que has configurado
 
-const transactions = [
-    { date: '03/08/2024', type: 'Gasto', description: 'Suministros de oficina', amount: 250 },
-    { date: '04/08/2024', type: 'Ingreso', description: 'Ventas tienda en línea', amount: 150 },
-    { date: '05/08/2024', type: 'Gasto', description: 'Servicios públicos oficina', amount: 350 },
-    { date: '06/08/2024', type: 'Gasto', description: 'Suministros', amount: 25 },
-];
-
 const HomePage = () => {
     const [checked, setChecked] = useState(true);
+    const [openModal, setOpenModal] = useState(false);
+    const [transactionData, setTransactionData] = useState({
+        date: '',
+        type: '',
+        description: '',
+        amount: ''
+    });
+    
+    const [transactions, setTransactions] = useState([
+        { date: '03/08/2024', type: 'Gasto', description: 'Suministros de oficina', amount: 250 },
+        { date: '04/08/2024', type: 'Ingreso', description: 'Ventas tienda en línea', amount: 150 },
+        { date: '05/08/2024', type: 'Gasto', description: 'Servicios públicos oficina', amount: 350 },
+        { date: '06/08/2024', type: 'Gasto', description: 'Suministros', amount: 25 },
+    ]);
+
     const navigate = useNavigate();
 
     const functionsMap = {
@@ -49,6 +62,35 @@ const HomePage = () => {
         navigate(path);
     };
 
+    const handleOpenModal = () => {
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+        setTransactionData({ date: '', type: '', description: '', amount: '' }); // Resetea el formulario al cerrar
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setTransactionData((prevData) => ({ ...prevData, [name]: value }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Agregar la nueva transacción al estado
+        setTransactions((prevTransactions) => [
+            ...prevTransactions,
+            {
+                date: transactionData.date,
+                type: transactionData.type,
+                description: transactionData.description,
+                amount: parseFloat(transactionData.amount) // Asegúrate de convertir el monto a número
+            }
+        ]);
+        handleCloseModal();
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ padding: { xs: '10px', md: '20px' }, backgroundColor: theme.palette.background.default }}>
@@ -57,14 +99,8 @@ const HomePage = () => {
                         Hola, [Nombre de Usuario]
                     </Typography>
                 </Slide>
-{/*                 <Slide direction="right" in={checked} timeout={500}>
-                    <Typography variant="subtitle1" color="text.secondary">
-                        Aquí tienes un resumen de tu estado financiero esta semana.
-                    </Typography>
-                </Slide> */}
 
                 {/* Tabla de Resumen de Transacciones */}
-
                 <Slide direction="right" in={checked} timeout={500}>
                     <Box sx={{ marginTop: '30px' }}>
                         <Typography variant="h5" color="primary" gutterBottom>
@@ -92,7 +128,7 @@ const HomePage = () => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Box sx={{ marginTop: '20px', textAlign: 'center' }}>
+                        <Box sx={{ marginTop: '20px', textAlign: 'center',}}>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -100,10 +136,17 @@ const HomePage = () => {
                             >
                                 Ver más detalles
                             </Button>
+                            <Button
+                                sx={{ marginLeft: '12px' }}
+                                variant="contained"
+                                color="primary"
+                                onClick={handleOpenModal}
+                            >
+                                Registrar nueva transacción
+                            </Button>
                         </Box>
                     </Box>
                 </Slide>
-
 
                 {/* Acceso Rápido a Funciones */}
                 <Box sx={{ marginTop: '30px' }}>
@@ -112,18 +155,8 @@ const HomePage = () => {
                     </Typography>
                     <Grid container spacing={2}>
                         {Object.keys(functionsMap).map((funcion, index) => (
-                            <Grid
-                                item
-                                xs={12}
-                                sm={6}
-                                md={4}
-                                lg={3}
-                                key={index}
-                            >
-                                <Grow
-                                    in={true}
-                                    timeout={index * 250 + 500}
-                                >
+                            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                                <Grow in={true} timeout={index * 250 + 500}>
                                     <Button
                                         variant="contained"
                                         color={index % 2 === 0 ? 'primary' : 'secondary'}
@@ -177,6 +210,65 @@ const HomePage = () => {
                         </Card>
                     </Slide>
                 </Box>
+
+                {/* Modal para Registrar Nueva Transacción */}
+                <Dialog open={openModal} onClose={handleCloseModal}>
+                    <DialogTitle>Registrar Nueva Transacción</DialogTitle>
+                    <DialogContent>
+                        <form onSubmit={handleSubmit}>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                name="date"
+                                label="Fecha"
+                                type="date"
+                                fullWidth
+                                variant="outlined"
+                                value={transactionData.date}
+                                onChange={handleChange}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                            <TextField
+                                margin="dense"
+                                name="type"
+                                label="Tipo (Ingreso/Gasto)"
+                                fullWidth
+                                variant="outlined"
+                                value={transactionData.type}
+                                onChange={handleChange}
+                            />
+                            <TextField
+                                margin="dense"
+                                name="description"
+                                label="Descripción"
+                                fullWidth
+                                variant="outlined"
+                                value={transactionData.description}
+                                onChange={handleChange}
+                            />
+                            <TextField
+                                margin="dense"
+                                name="amount"
+                                label="Monto"
+                                type="number"
+                                fullWidth
+                                variant="outlined"
+                                value={transactionData.amount}
+                                onChange={handleChange}
+                            />
+                            <DialogActions>
+                                <Button onClick={handleCloseModal} color="secondary">
+                                    Cancelar
+                                </Button>
+                                <Button type="submit" color="primary">
+                                    Registrar
+                                </Button>
+                            </DialogActions>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </Box>
         </ThemeProvider>
     );
