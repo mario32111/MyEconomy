@@ -48,7 +48,7 @@ const ShoppingSimulator = () => {
                 }}
             >
                 <Typography variant="h5" color="primary" gutterBottom>
-                    Simulador de Compras
+                    Simulador de Interes de Banco
                 </Typography>
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
@@ -78,6 +78,7 @@ const ShoppingSimulator = () => {
                                         onChange={(e) => setTaxRate(e.target.value)}
                                         displayEmpty
                                     >
+                                        <MenuItem value={0}>personalizar</MenuItem>
                                         <MenuItem value={0}>Sin Impuesto</MenuItem>
                                         <MenuItem value={5}>IVA 5%</MenuItem>
                                         <MenuItem value={10}>IVA 10%</MenuItem>
