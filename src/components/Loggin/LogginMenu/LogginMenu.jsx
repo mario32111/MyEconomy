@@ -19,7 +19,7 @@ const LogginMenu = () => {
     event.preventDefault();
     console.log('Email:', email);
     console.log('Password:', password);
-    changePath('/chatai');
+    changePath('/Home');
     // Aquí iría la lógica para enviar el login a un backend o servicio
   };
 

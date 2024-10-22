@@ -43,8 +43,8 @@ const ExpenseChart = () => {
     }));
 
     return (
-        <Box>
-            <h2 style={{ color: '#0F2532', width: '500px', textAlign: 'center' }}>Distribución de Gastos</h2> {/* Aquí puedes cambiar el color según tu tema */}
+        <Box style={{width: '280px', margin: '0 auto'}}>
+            <h2 style={{ color: '#0F2532', width: '100%', textAlign: 'center', margin: '0 auto'}}>Distribución de Gastos</h2> {/* Aquí puedes cambiar el color según tu tema */}
 
             {/* Input para el umbral de gastos */}
             <TextField
@@ -96,8 +96,8 @@ const ExpenseChart = () => {
                     cx: 150,
                     cy: 150,
                 }]}
-                width={500}
-                height={500}
+                width={280}
+                height={750}
             />
         </Box>
     );

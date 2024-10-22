@@ -17,31 +17,33 @@ import {
   Typography,
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
+import { Grow, Slide } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../../colors';
 
 const servicesInitial = [
-  { 
-    name: 'Internet', 
-    type: 'Básico', 
-    active: true, 
-    autoRenew: true, 
-    paymentMethod: 'Tarjeta de Crédito', 
-    paymentFrequency: 'Mensual', 
-    paymentAmount: '$500' 
+  {
+    name: 'Internet',
+    type: 'Básico',
+    active: true,
+    autoRenew: true,
+    paymentMethod: 'Tarjeta de Crédito',
+    paymentFrequency: 'Mensual',
+    paymentAmount: '$500'
   },
-  { 
-    name: 'Netflix', 
-    type: 'Digital', 
-    active: true, 
-    autoRenew: true, 
-    paymentMethod: 'PayPal', 
-    paymentFrequency: 'Mensual', 
-    paymentAmount: '$150' 
+  {
+    name: 'Netflix',
+    type: 'Digital',
+    active: true,
+    autoRenew: true,
+    paymentMethod: 'PayPal',
+    paymentFrequency: 'Mensual',
+    paymentAmount: '$150'
   },
 ];
 
 const ControlDeSuscripciones = () => {
+  const [checked, setChecked] = useState(true); // Estado para el control de la animación
   const [services, setServices] = useState(servicesInitial);
   const [openModal, setOpenModal] = useState(false);
   const [newService, setNewService] = useState({
@@ -87,41 +89,47 @@ const ControlDeSuscripciones = () => {
           {services.map((service, index) => (
             <Box key={index}>
               <ListItem>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={8}>
-                    <ListItemText
-                      primary={service.name}
-                      secondary={`Tipo: ${service.type} | Método de Pago: ${service.paymentMethod} | Frecuencia: ${service.paymentFrequency} | Monto: ${service.paymentAmount}`}
-                    />
+                <Grow
+                  in={true}
+                  timeout={index * 250 + 500} // Ajusta el delay para cada botón
+                >
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} sm={8}>
+                      <ListItemText
+                        primary={service.name}
+                        secondary={`Tipo: ${service.type} | Método de Pago: ${service.paymentMethod} | Frecuencia: ${service.paymentFrequency} | Monto: ${service.paymentAmount}`}
+                      />
+                    </Grid>
+                    <Grid item xs={6} sm={2}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={service.active}
+                            onChange={() => handleToggleService(index)}
+                            color="primary"
+                          />
+                        }
+                        label={service.active ? 'Activo' : 'Inactivo'}
+                      />
+                    </Grid>
+                    <Grid item xs={6} sm={2}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={service.autoRenew}
+                            onChange={() => handleToggleAutoRenew(index)}
+                            color="primary"
+                          />
+                        }
+                        label="Renovación Automática"
+                      />
+                      <IconButton onClick={() => handleDeleteService(index)} color="error">
+                        <Delete />
+                      </IconButton>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6} sm={2}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={service.active}
-                          onChange={() => handleToggleService(index)}
-                          color="primary"
-                        />
-                      }
-                      label={service.active ? 'Activo' : 'Inactivo'}
-                    />
-                  </Grid>
-                  <Grid item xs={6} sm={2}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={service.autoRenew}
-                          onChange={() => handleToggleAutoRenew(index)}
-                          color="primary"
-                        />
-                      }
-                      label="Renovación Automática"
-                    />
-                    <IconButton onClick={() => handleDeleteService(index)} color="error">
-                      <Delete />
-                    </IconButton>
-                  </Grid>
-                </Grid>
+                </Grow>
+
               </ListItem>
               <Divider />
             </Box>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
+import { Grow, Slide } from '@mui/material';
 import { theme } from '../../colors'; // Asegúrate de que la ruta al tema sea correcta
 import {
   Box,
@@ -58,6 +59,8 @@ const Chat = () => {
   const handleSelectConversation = (index) => {
     setCurrentConversationIndex(index); // Cambiar a la conversación seleccionada
   };
+  const [checked, setChecked] = useState(true); // Estado para el control de la animación
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -69,85 +72,92 @@ const Chat = () => {
           backgroundColor: theme.palette.background.default,
         }}
       >
-{/*         <AppBar position="static" sx={{ borderTopLeftRadius: '12px',borderTopRightRadius: '12px' }}>
+        {/*         <AppBar position="static" sx={{ borderTopLeftRadius: '12px',borderTopRightRadius: '12px' }}>
           <Toolbar >
             <Typography variant="h6">Chat con IA</Typography>
           </Toolbar>
         </AppBar> */}
 
         <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, overflow: 'hidden' }}>
-          <Paper
-            elevation={3}
-            sx={{
-              flex: { xs: 'none', md: '1' },
-              overflow: 'auto',
-              padding: 2,
-              marginRight: { xs: 0, md: 2 },
-              marginBottom: { xs: 2, md: 0 },
-              maxWidth: { md: 300 }, // Limitamos el ancho del historial en pantallas medianas
-            }}
-          >
-            <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
-              Historial de Conversaciones
-            </Typography>
-            <List>
-              {conversations.map((conversation, index) => (
-                <ListItem button key={index} onClick={() => handleSelectConversation(index)}>
-                  <ListItemText primary={`Conversación ${index + 1} (${conversation.messages.length} mensajes)`} />
-                </ListItem>
-              ))}
-              <Divider />
-              <ListItem button onClick={handleNewConversation}>
-                <ListItemText primary="Nueva Conversación" />
-              </ListItem>
-            </List>
-          </Paper>
-
-          <Paper
-            elevation={3}
-            sx={{
-              flex: 1,
-              overflow: 'auto',
-              padding: 2,
-            }}
-          >
-            <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
-              {currentConversationIndex === null
-                ? 'Iniciar una Nueva Conversación'
-                : 'Conversación Actual'}
-            </Typography>
-            <List>
-              {currentConversationIndex !== null &&
-                conversations[currentConversationIndex]?.messages?.map((msg, index) => (
-                  <div key={index}>
-                    <ListItem>
-                      <ListItemText
-                        primary={msg.text}
-                        sx={{
-                          color: msg.sender === 'user' ? theme.palette.text.primary : theme.palette.text.secondary,
-                          textAlign: msg.sender === 'user' ? 'right' : 'left',
-                        }}
-                      />
-                    </ListItem>
-                    {index < conversations[currentConversationIndex].messages.length - 1 && <Divider />}
-                  </div>
+          <Slide direction="right" in={checked} timeout={500}>
+            <Paper
+              elevation={3}
+              sx={{
+                flex: { xs: 'none', md: '1' },
+                overflow: 'auto',
+                padding: 2,
+                marginRight: { xs: 0, md: 2 },
+                marginBottom: { xs: 2, md: 0 },
+                maxWidth: { md: 300 }, // Limitamos el ancho del historial en pantallas medianas
+              }}
+            >
+              <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
+                Historial de Conversaciones
+              </Typography>
+              <List>
+                {conversations.map((conversation, index) => (
+                  <ListItem button key={index} onClick={() => handleSelectConversation(index)}>
+                    <ListItemText primary={`Conversación ${index + 1} (${conversation.messages.length} mensajes)`} />
+                  </ListItem>
                 ))}
-            </List>
-          </Paper>
-        </Box>
+                <Divider />
+                <ListItem button onClick={handleNewConversation}>
+                  <ListItemText primary="Nueva Conversación" />
+                </ListItem>
+              </List>
+            </Paper>
+          </Slide>
 
-        <Box sx={{ display: 'flex', marginTop: 2 }}>
-          <TextField
-            variant="outlined"
-            placeholder="Escribe un mensaje..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            sx={{ flex: 1, marginRight: 1 }}
-          />
-          <Button variant="contained" color="primary" onClick={handleSendMessage}>
-            Enviar
-          </Button>
+          <Slide direction="left" in={checked} timeout={500}>
+            <Paper
+              elevation={3}
+              sx={{
+                flex: 1,
+                overflow: 'auto',
+                padding: 2,
+              }}
+            >
+              <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
+                {currentConversationIndex === null
+                  ? 'Iniciar una Nueva Conversación'
+                  : 'Conversación Actual'}
+              </Typography>
+              <List>
+                {currentConversationIndex !== null &&
+                  conversations[currentConversationIndex]?.messages?.map((msg, index) => (
+                    <div key={index}>
+                      <ListItem>
+                        <ListItemText
+                          primary={msg.text}
+                          sx={{
+                            color: msg.sender === 'user' ? theme.palette.text.primary : theme.palette.text.secondary,
+                            textAlign: msg.sender === 'user' ? 'right' : 'left',
+                          }}
+                        />
+                      </ListItem>
+                      {index < conversations[currentConversationIndex].messages.length - 1 && <Divider />}
+                    </div>
+                  ))}
+              </List>
+            </Paper>
+          </Slide>
+
         </Box>
+        <Grow in={checked} timeout={1000}>
+          <Box sx={{ display: 'flex', marginTop: 2 }}>
+            <TextField
+              variant="outlined"
+              placeholder="Escribe un mensaje..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              sx={{ flex: 1, marginRight: 1 }}
+            />
+            <Button variant="contained" color="primary" onClick={handleSendMessage}>
+              Enviar
+            </Button>
+          </Box>
+        </Grow>
+
       </Box>
     </ThemeProvider>
   );

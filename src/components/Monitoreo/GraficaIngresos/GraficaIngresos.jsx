@@ -9,7 +9,7 @@ const chartSetting = {
             label: 'ingresos',
         },
     ],
-    width: 500,
+    width: 300,
     height: 300,
     sx: {
         [`.${axisClasses.left} .${axisClasses.label}`]: {
@@ -20,8 +20,8 @@ const chartSetting = {
 
 export default function BarsDataset() {
     return (
-        <div>
-            <h2 style={{ color: '#0F2532', width: '500px', textAlign: 'center' }}>Distribución de Ingresos</h2> {/* Aquí puedes cambiar el color según tu tema */}
+        <div style={{width: '280px', margin: '0 auto'}}>
+            <h2 style={{ color: '#0F2532', width: '100%', textAlign: 'center' }}>Distribución de Ingresos</h2> {/* Aquí puedes cambiar el color según tu tema */}
 
             <BarChart
                 dataset={dataset}

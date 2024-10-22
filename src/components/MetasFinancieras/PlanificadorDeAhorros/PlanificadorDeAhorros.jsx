@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, MenuItem, Paper } from '@mui/material';
+import { TextField, Button, Typography, Container, MenuItem, Paper, Grid } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { LineChart } from '@mui/x-charts/LineChart'; // Gráfica de líneas de Material UI
 import { theme } from '../../colors'; // Asegúrate de ajustar la ruta según tu estructura de archivos
@@ -43,57 +43,63 @@ const PlanificadorAhorros = () => {
           Planificador de Ahorros Automático
         </Typography>
 
-        {/* Entrada de cantidad */}
-        <TextField
-          label="Cantidad a Ahorrar"
-          variant="outlined"
-          type="number"
-          fullWidth
-          value={cantidad}
-          onChange={(e) => setCantidad(e.target.value)}
-          style={{ marginBottom: '20px' }}
-        />
+        <Grid container spacing={2}>
+          {/* Entrada de cantidad */}
+          <Grid item xs={12}>
+            <TextField
+              label="Cantidad a Ahorrar"
+              variant="outlined"
+              type="number"
+              fullWidth
+              value={cantidad}
+              onChange={(e) => setCantidad(e.target.value)}
+            />
+          </Grid>
 
-        {/* Frecuencia de transferencia */}
-        <TextField
-          label="Frecuencia"
-          variant="outlined"
-          select
-          fullWidth
-          value={frecuencia}
-          onChange={(e) => setFrecuencia(e.target.value)}
-          style={{ marginBottom: '20px' }}
-        >
-          <MenuItem value="Diario">Diario</MenuItem>
-          <MenuItem value="Semanal">Semanal</MenuItem>
-          <MenuItem value="Mensual">Mensual</MenuItem>
-        </TextField>
+          {/* Frecuencia de transferencia */}
+          <Grid item xs={12}>
+            <TextField
+              label="Frecuencia"
+              variant="outlined"
+              select
+              fullWidth
+              value={frecuencia}
+              onChange={(e) => setFrecuencia(e.target.value)}
+            >
+              <MenuItem value="Diario">Diario</MenuItem>
+              <MenuItem value="Semanal">Semanal</MenuItem>
+              <MenuItem value="Mensual">Mensual</MenuItem>
+            </TextField>
+          </Grid>
 
-        {/* Tipo de cuenta */}
-        <TextField
-          label="Tipo de Cuenta"
-          variant="outlined"
-          select
-          fullWidth
-          value={tipoCuenta}
-          onChange={(e) => setTipoCuenta(e.target.value)}
-          style={{ marginBottom: '20px' }}
-        >
-          <MenuItem value="Ahorros">Ahorros</MenuItem>
-          <MenuItem value="Inversión">Inversión</MenuItem>
-          <MenuItem value="Fondo de Emergencia">Fondo de Emergencia</MenuItem>
-        </TextField>
+          {/* Tipo de cuenta */}
+          <Grid item xs={12}>
+            <TextField
+              label="Tipo de Cuenta"
+              variant="outlined"
+              select
+              fullWidth
+              value={tipoCuenta}
+              onChange={(e) => setTipoCuenta(e.target.value)}
+            >
+              <MenuItem value="Ahorros">Ahorros</MenuItem>
+              <MenuItem value="Inversión">Inversión</MenuItem>
+              <MenuItem value="Fondo de Emergencia">Fondo de Emergencia</MenuItem>
+            </TextField>
+          </Grid>
 
-        {/* Botón de planificación */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handlePlanificar}
-          fullWidth
-          style={{ marginBottom: '20px' }}
-        >
-          Establecer Plan
-        </Button>
+          {/* Botón de planificación */}
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handlePlanificar}
+              fullWidth
+            >
+              Establecer Plan
+            </Button>
+          </Grid>
+        </Grid>
 
         {/* Resumen de transferencias programadas */}
         <Paper style={{ padding: '20px', marginBottom: '20px' }}>
@@ -118,8 +124,8 @@ const PlanificadorAhorros = () => {
             xAxis={[{ label: 'Meses', dataKey: 'x' }]}
             series={[{ label: 'Ahorros', dataKey: 'y' }]}
             dataset={data} 
-            width={500}
-            height={300}
+            width="100%" // Cambia el ancho a 100%
+            height={300} // Mantén la altura
           />
         </Paper>
       </Container>
