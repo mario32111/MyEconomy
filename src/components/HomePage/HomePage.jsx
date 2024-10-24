@@ -54,7 +54,7 @@ const HomePage = () => {
         'Sistema de Ahorro': '/presupuesto',
         'Inventario': '/inventario',
         'Presupuesto': '/presupuesto',
-        'Simulador de Compras': '/simulador-compras',
+        'Simulador de Interes': '/simulador-compras',
         'Soporte': '/soporte'
     };
 
