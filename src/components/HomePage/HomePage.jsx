@@ -34,7 +34,7 @@ const HomePage = () => {
         description: '',
         amount: ''
     });
-    
+    //esto no va acarriba es lo de la tabla o historial
     const [transactions, setTransactions] = useState([
         { date: '03/08/2024', type: 'Gasto', description: 'Suministros de oficina', amount: 250 },
         { date: '04/08/2024', type: 'Ingreso', description: 'Ventas tienda en línea', amount: 150 },
@@ -54,7 +54,11 @@ const HomePage = () => {
         'Sistema de Ahorro': '/presupuesto',
         'Inventario': '/inventario',
         'Presupuesto': '/presupuesto',
+<<<<<<< HEAD
         'Simulador de Interes': '/simulador-compras',
+=======
+        'Simulador de interes': '/simulador-compras',
+>>>>>>> f80835a3f1c9d349f14172cc57036c85ca9951d8
         'Soporte': '/soporte'
     };
 
