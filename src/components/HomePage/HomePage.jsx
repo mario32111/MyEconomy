@@ -54,12 +54,8 @@ const HomePage = () => {
         'Sistema de Ahorro': '/presupuesto',
         'Inventario': '/inventario',
         'Presupuesto': '/presupuesto',
-<<<<<<< HEAD
         'Simulador de Interes': '/simulador-compras',
-=======
-        'Simulador de interes': '/simulador-compras',
->>>>>>> f80835a3f1c9d349f14172cc57036c85ca9951d8
-        'Soporte': '/soporte'
+        'Soporte': '/soporte',
     };
 
     const handleButtonClick = (path) => {
