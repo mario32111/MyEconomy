@@ -87,7 +87,7 @@ const ExpenseChart = () => {
             <PieChart
                 series={[{
                     data: chartData,
-                    innerRadius: 10,
+                    innerRadius: 70,
                     outerRadius: 113,
                     paddingAngle: 1,
                     cornerRadius: 12,

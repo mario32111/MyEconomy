@@ -15,7 +15,7 @@ const ShoppingSimulator = () => {
     const [history, setHistory] = useState([]);
 
     // Función para calcular el total a crédito y las estadísticas
-    const calculateStats = () => {
+    const calculateStats = () => { 
         const cash = parseFloat(cashPrice);
         const creditTotal = parseFloat(weeks) * parseFloat(weeklyPayment);
         const increase = creditTotal - cash;
@@ -95,10 +95,11 @@ const ShoppingSimulator = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
-                <Typography variant="h5" color="primary" gutterBottom>
-                    Simulador de Intereses a Meses
-                </Typography>
+<Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
+    <Typography variant="h5" color="primary" gutterBottom>
+        Simulador de Intereses a Meses
+    </Typography>
+
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                         <Slide in={checked} timeout={500}>
