@@ -2,276 +2,159 @@ import React, { useState } from 'react';
 import {
     Box,
     Typography,
-    Grid,
     Button,
-    Card,
-    CardContent,
-    Grow,
-    Slide,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
+    TextField,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel,
+    List,
+    ListItem,
+    ListItemText
 } from '@mui/material';
+import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { ThemeProvider } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
-import { theme } from '../colors'; // Importa el tema desde el archivo que has configurado
+import { theme } from '../colors'; // Importa el tema desde tu archivo configurado
 
 const HomePage = () => {
-    const [checked, setChecked] = useState(true);
     const [openModal, setOpenModal] = useState(false);
-    const [transactionData, setTransactionData] = useState({
-        date: '',
-        type: '',
-        description: '',
-        amount: ''
-    });
-    //esto no va acarriba es lo de la tabla o historial
-    const [transactions, setTransactions] = useState([
-        { date: '03/08/2024', type: 'Gasto', description: 'Suministros de oficina', amount: 250 },
-        { date: '04/08/2024', type: 'Ingreso', description: 'Ventas tienda en línea', amount: 150 },
-        { date: '05/08/2024', type: 'Gasto', description: 'Servicios públicos oficina', amount: 350 },
-        { date: '06/08/2024', type: 'Gasto', description: 'Suministros', amount: 25 },
-    ]);
+    const [transactions, setTransactions] = useState([]);
+    const [totalSpent, setTotalSpent] = useState(0);
+    const [budget, setBudget] = useState(1000); // Presupuesto diario inicial
+    const [amountLeft, setAmountLeft] = useState(1000); // Presupuesto diario inicial
+    const [transactionData, setTransactionData] = useState({ amount: '', category: '', type: '' });
 
-    const navigate = useNavigate();
-
-    const functionsMap = {
-        'ChatAI': '/chatai',
-        'Control de Servicios': '/control',
-        'Cursos': '/cursos',
-        'Metas Financieras': '/metas-financieras',
-        'Monitoreo': '/monitoreo',
-        'Comparación de Tasas de Interés': '/comparacion-tasas',
-        'Sistema de Ahorro': '/presupuesto',
-        'Inventario': '/inventario',
-        'Presupuesto': '/presupuesto',
-<<<<<<< HEAD
-        'Simulador de Interes': '/simulador-compras',
-=======
-        'Simulador de interes': '/simulador-compras',
->>>>>>> f80835a3f1c9d349f14172cc57036c85ca9951d8
-        'Soporte': '/soporte'
-    };
-
-    const handleButtonClick = (path) => {
-        navigate(path);
-    };
-
+    // Colores para las categorías en el gráfico de pastel
+    const COLORS = ['#FFBB28', '#FF8042', '#0088FE', '#00C49F', '#FF6361'];
+    
+    // Actualización de la gráfica con los datos de transacciones
+    const data = transactions.reduce((acc, item) => {
+        const existingCategory = acc.find(d => d.name === item.category);
+        if (existingCategory) {
+            existingCategory.value += item.amount;
+        } else {
+            acc.push({ name: item.category, value: item.amount });
+        }
+        return acc;
+    }, []);
+    
     const handleOpenModal = () => {
         setOpenModal(true);
     };
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        setTransactionData({ date: '', type: '', description: '', amount: '' }); // Resetea el formulario al cerrar
+        setTransactionData({ amount: '', category: '', type: '' });
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setTransactionData((prevData) => ({ ...prevData, [name]: value }));
-    };
+    const handleAddTransaction = () => {
+        const amount = parseFloat(transactionData.amount);
+        const newTransaction = {
+            amount,
+            category: transactionData.category,
+            type: transactionData.type
+        };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Agregar la nueva transacción al estado
-        setTransactions((prevTransactions) => [
-            ...prevTransactions,
-            {
-                date: transactionData.date,
-                type: transactionData.type,
-                description: transactionData.description,
-                amount: parseFloat(transactionData.amount) // Asegúrate de convertir el monto a número
-            }
-        ]);
+        // Actualizar transacciones y el total
+        setTransactions([...transactions, newTransaction]);
+        setTotalSpent(totalSpent + amount);
+        setAmountLeft(budget - (totalSpent + amount));
         handleCloseModal();
+    };
+
+    const handleDeleteLast = () => {
+        const lastTransaction = transactions.pop();
+        setTotalSpent(totalSpent - lastTransaction.amount);
+        setAmountLeft(budget - (totalSpent - lastTransaction.amount));
+        setTransactions([...transactions]);
     };
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ padding: { xs: '10px', md: '20px' }, backgroundColor: theme.palette.background.default }}>
-                <Slide direction="right" in={checked} timeout={500}>
-                    <Typography variant="h4" color="primary" gutterBottom>
-                        Hola, [Nombre de Usuario]
-                    </Typography>
-                </Slide>
+            <Box sx={{ padding: '20px', backgroundColor: theme.palette.background.default, maxWidth: '800px', margin: '0 auto' }}>
+                <Typography variant="h4" color="primary" gutterBottom>Resumen de Gastos</Typography>
 
-                {/* Tabla de Resumen de Transacciones */}
-                <Slide direction="right" in={checked} timeout={500}>
-                    <Box sx={{ marginTop: '30px' }}>
-                        <Typography variant="h5" color="primary" gutterBottom>
-                            Resumen financiero de la semana
-                        </Typography>
-                        <TableContainer component={Paper}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Fecha</TableCell>
-                                        <TableCell>Tipo</TableCell>
-                                        <TableCell>Descripción</TableCell>
-                                        <TableCell align="right">Monto</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {transactions.map((transaction, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>{transaction.date}</TableCell>
-                                            <TableCell>{transaction.type}</TableCell>
-                                            <TableCell>{transaction.description}</TableCell>
-                                            <TableCell align="right">${transaction.amount.toFixed(2)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <Box sx={{ marginTop: '20px', textAlign: 'center',}}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => handleButtonClick('/monitoreo')}
-                            >
-                                Ver más detalles
-                            </Button>
-                            <Button
-                                sx={{ marginLeft: '12px' }}
-                                variant="contained"
-                                color="primary"
-                                onClick={handleOpenModal}
-                            >
-                                Registrar nueva transacción
-                            </Button>
-                        </Box>
+                <Typography variant="h6" color="textSecondary">
+                    Presupuesto Diario: ${budget.toFixed(2)} | Gastos: ${totalSpent.toFixed(2)} | Disponible: ${amountLeft.toFixed(2)}
+                </Typography>
+
+                {/* Gráfica de Pastel */}
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
+                    <PieChart width={400} height={400}>
+                        <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={150} fill="#8884d8" label>
+                            {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Legend />
+                    </PieChart>
+                    <Box sx={{ position: 'absolute', top: 'calc(50% - 40px)', textAlign: 'center' }}>
+                        <Typography variant="h5" color="success.main">${amountLeft.toFixed(2)}</Typography>
+                        <Typography variant="subtitle1" color="error.main">Gastos: ${totalSpent.toFixed(2)}</Typography>
                     </Box>
-                </Slide>
-
-                {/* Acceso Rápido a Funciones */}
-                <Box sx={{ marginTop: '30px' }}>
-                    <Typography variant="h5" color="primary" gutterBottom>
-                        Acceso Rápido
-                    </Typography>
-                    <Grid container spacing={2}>
-                        {Object.keys(functionsMap).map((funcion, index) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                                <Grow in={true} timeout={index * 250 + 500}>
-                                    <Button
-                                        variant="contained"
-                                        color={index % 2 === 0 ? 'primary' : 'secondary'}
-                                        fullWidth
-                                        sx={{
-                                            fontSize: { xs: '0.8rem', md: '1rem' },
-                                            padding: { xs: '8px', md: '12px' }
-                                        }}
-                                        onClick={() => handleButtonClick(functionsMap[funcion])}
-                                    >
-                                        {funcion}
-                                    </Button>
-                                </Grow>
-                            </Grid>
-                        ))}
-                    </Grid>
                 </Box>
 
-                {/* Sección de Notificaciones */}
-                <Box sx={{ marginTop: '30px' }}>
-                    <Slide direction="right" in={checked} timeout={500}>
-                        <Typography variant="h5" color="primary" gutterBottom>
-                            Notificaciones
-                        </Typography>
-                    </Slide>
-                    <Slide direction="right" in={checked} timeout={500}>
-                        <Card sx={{ marginBottom: '20px' }}>
-                            <CardContent>
-                                <Typography variant="body1" color="text.primary">
-                                    Recuerda pagar tu suscripción a [servicio] en 3 días.
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Slide>
+                {/* Botones y Formulario de Agregar Transacción */}
+                <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+                    <Button variant="contained" color="primary" onClick={handleOpenModal}>Agregar Gasto</Button>
+                    <Button variant="contained" color="secondary" sx={{ marginLeft: '10px' }} onClick={handleDeleteLast}>
+                        Eliminar Último Gasto
+                    </Button>
                 </Box>
 
-                {/* Sección de Cursos */}
-                <Box sx={{ marginTop: '30px' }}>
-                    <Slide direction="right" in={checked} timeout={500}>
-                        <Typography variant="h5" color="primary" gutterBottom>
-                            Últimos Cursos
-                        </Typography>
-                    </Slide>
-                    <Slide direction="right" in={checked} timeout={500}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="body1" color="text.primary">
-                                    Nuevo curso disponible: Aprende a invertir desde cero.
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Slide>
-                </Box>
+                {/* Lista de Categorías */}
+                <List sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px' }}>
+                    {data.map((item, index) => (
+                        <ListItem key={index}>
+                            <ListItemText primary={`${item.name}: $${item.value.toFixed(2)}`} />
+                        </ListItem>
+                    ))}
+                </List>
 
-                {/* Modal para Registrar Nueva Transacción */}
+                {/* Modal para Agregar Nueva Transacción */}
                 <Dialog open={openModal} onClose={handleCloseModal}>
-                    <DialogTitle>Registrar Nueva Transacción</DialogTitle>
+                    <DialogTitle>Agregar Gasto</DialogTitle>
                     <DialogContent>
-                        <form onSubmit={handleSubmit}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                name="date"
-                                label="Fecha"
-                                type="date"
-                                fullWidth
-                                variant="outlined"
-                                value={transactionData.date}
-                                onChange={handleChange}
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                            />
-                            <TextField
-                                margin="dense"
-                                name="type"
-                                label="Tipo (Ingreso/Gasto)"
-                                fullWidth
-                                variant="outlined"
+                        <TextField
+                            label="Monto"
+                            type="number"
+                            fullWidth
+                            margin="dense"
+                            value={transactionData.amount}
+                            onChange={(e) => setTransactionData({ ...transactionData, amount: e.target.value })}
+                        />
+                        <FormControl fullWidth margin="dense">
+                            <InputLabel>Categoría</InputLabel>
+                            <Select
+                                value={transactionData.category}
+                                onChange={(e) => setTransactionData({ ...transactionData, category: e.target.value })}
+                            >
+                                <MenuItem value="Restaurante">Restaurante</MenuItem>
+                                <MenuItem value="Servicios">Servicios</MenuItem>
+                                <MenuItem value="Transporte">Transporte</MenuItem>
+                                <MenuItem value="Entretenimiento">Entretenimiento</MenuItem>
+                                <MenuItem value="Regalos">Regalos</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth margin="dense">
+                            <InputLabel>Tipo</InputLabel>
+                            <Select
                                 value={transactionData.type}
-                                onChange={handleChange}
-                            />
-                            <TextField
-                                margin="dense"
-                                name="description"
-                                label="Descripción"
-                                fullWidth
-                                variant="outlined"
-                                value={transactionData.description}
-                                onChange={handleChange}
-                            />
-                            <TextField
-                                margin="dense"
-                                name="amount"
-                                label="Monto"
-                                type="number"
-                                fullWidth
-                                variant="outlined"
-                                value={transactionData.amount}
-                                onChange={handleChange}
-                            />
-                            <DialogActions>
-                                <Button onClick={handleCloseModal} color="secondary">
-                                    Cancelar
-                                </Button>
-                                <Button type="submit" color="primary">
-                                    Registrar
-                                </Button>
-                            </DialogActions>
-                        </form>
+                                onChange={(e) => setTransactionData({ ...transactionData, type: e.target.value })}
+                            >
+                                <MenuItem value="Gasto">Gasto</MenuItem>
+                                <MenuItem value="Préstamo">Préstamo</MenuItem>
+                            </Select>
+                        </FormControl>
                     </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseModal} color="secondary">Cancelar</Button>
+                        <Button onClick={handleAddTransaction} color="primary">Agregar</Button>
+                    </DialogActions>
                 </Dialog>
             </Box>
         </ThemeProvider>

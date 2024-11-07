@@ -15,7 +15,7 @@ const ShoppingSimulator = () => {
     const [history, setHistory] = useState([]);
 
     // Función para calcular el total a crédito y las estadísticas
-    const calculateStats = () => {
+    const calculateStats = () => { 
         const cash = parseFloat(cashPrice);
         const creditTotal = parseFloat(weeks) * parseFloat(weeklyPayment);
         const increase = creditTotal - cash;
@@ -95,14 +95,11 @@ const ShoppingSimulator = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
-                <Typography variant="h5" color="primary" gutterBottom>
-<<<<<<< HEAD
-                    Simulador de Intereses a Meses
-=======
-                    Simulador de Interes de Banco
->>>>>>> f80835a3f1c9d349f14172cc57036c85ca9951d8
-                </Typography>
+<Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
+    <Typography variant="h5" color="primary" gutterBottom>
+        Simulador de Intereses a Meses
+    </Typography>
+
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                         <Slide in={checked} timeout={500}>
@@ -111,24 +108,12 @@ const ShoppingSimulator = () => {
                                     Ingresar Detalles del Producto
                                 </Typography>
                                 <FormControl fullWidth margin="normal">
-<<<<<<< HEAD
                                     <Select value={store} onChange={(e) => setStore(e.target.value)} displayEmpty>
                                         <MenuItem value="">Seleccionar Tienda</MenuItem>
                                         <MenuItem value="Elektra">Elektra</MenuItem>
                                         <MenuItem value="Coppel">Coppel</MenuItem>
                                         <MenuItem value="Liverpool">Liverpool</MenuItem>
-=======
-                                    <Select
-                                        value={taxRate}
-                                        onChange={(e) => setTaxRate(e.target.value)}
-                                        displayEmpty
-                                    >
-                                        <MenuItem value={0}>personalizar</MenuItem>
-                                        <MenuItem value={0}>Sin Impuesto</MenuItem>
-                                        <MenuItem value={5}>IVA 5%</MenuItem>
-                                        <MenuItem value={10}>IVA 10%</MenuItem>
-                                        <MenuItem value={16}>IVA 16%</MenuItem>
->>>>>>> f80835a3f1c9d349f14172cc57036c85ca9951d8
+
                                     </Select>
                                 </FormControl>
                                 <TextField
