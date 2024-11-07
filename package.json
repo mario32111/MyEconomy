@@ -7,6 +7,8 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.4",
     "@mui/material": "^6.1.1",
+    "@mui/styled-engine": "^6.1.5",
+    "@mui/system": "^6.1.5",
     "@mui/x-charts": "^7.18.0",
     "@mui/x-date-pickers": "^7.18.0",
     "@testing-library/jest-dom": "^5.17.0",
