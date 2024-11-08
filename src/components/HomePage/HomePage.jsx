@@ -24,7 +24,7 @@ const HomePage = () => {
     const [openModal, setOpenModal] = useState(false);
     const [transactions, setTransactions] = useState([]);
     const [totalSpent, setTotalSpent] = useState(0);
-    const [budget, setBudget] = useState(1000); // Presupuesto diario inicial
+    const [budget, setBudget] = useState(1000); // Presupuesto diario inicia
     const [amountLeft, setAmountLeft] = useState(1000); // Presupuesto diario inicial
     const [transactionData, setTransactionData] = useState({ amount: '', category: '', type: '' });
 
