@@ -279,8 +279,8 @@ const NavBarPrincipal = ({ children, footer }) => {
             >
                 <Toolbar />
                 {children}
-                {/*                 {footer}
- */}            </Box>
+                {footer}
+                </Box>
         </Box>
 
 

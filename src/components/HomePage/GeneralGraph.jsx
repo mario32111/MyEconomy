@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField';
 import { Box, Typography } from '@mui/material';
 
 const ExpenseChart = () => {
+    // Datos de gastos con fechas
     const allData = [
         { category: 'Alimentos', amount: 300, date: '2024-09-01' },
         { category: 'Transporte', amount: 150, date: '2024-09-05' },
@@ -13,33 +14,42 @@ const ExpenseChart = () => {
         { category: 'Otros', amount: 50, date: '2024-09-25' },
     ];
 
+    // Estado para manejar el rango de gastos y fechas
     const [amountThreshold, setAmountThreshold] = useState(0);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
+    // Filtrar los datos según el umbral y las fechas seleccionadas
     const filteredData = allData.filter((item) => {
         const date = new Date(item.date);
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
 
+        // Filtrar por rango de gastos
         const withinAmountRange = item.amount >= amountThreshold;
-        const withinDateRange = (!start || date >= start) && (!end || date <= end);
+
+        // Filtrar por rango de fechas
+        const withinDateRange =
+            (!start || date >= start) && (!end || date <= end);
 
         return withinAmountRange && withinDateRange;
     });
 
+    // Formatear los datos para el gráfico
     const chartData = filteredData.map((item, index) => ({
         id: index,
         value: item.amount,
         label: item.category,
     }));
 
+    // Calcular la suma total de los gastos filtrados
     const totalExpense = filteredData.reduce((sum, item) => sum + item.amount, 0);
 
     return (
         <Box style={{ width: '280px', margin: '0 auto', position: 'relative' }}>
             <h2 style={{ color: '#0F2532', width: '100%', textAlign: 'center', margin: '0 auto' }}>Distribución de Gastos</h2>
 
+            {/* Input para el umbral de gastos */}
             <TextField
                 type="number"
                 label="Gastos Mínimos"
@@ -51,6 +61,7 @@ const ExpenseChart = () => {
                 style={{ width: '120px' }}
             />
 
+            {/* Selectores para el rango de fechas */}
             <Box display="flex" alignItems="center" gap={2} marginBottom={2}>
                 <TextField
                     type="date"
@@ -76,6 +87,7 @@ const ExpenseChart = () => {
                 />
             </Box>
 
+            {/* Pie Chart con el total de gastos en el centro */}
             <Box style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <PieChart
                     series={[{
@@ -93,6 +105,7 @@ const ExpenseChart = () => {
                     height={750}
                 />
                 
+                {/* Mostrar el total en el centro del gráfico */}
                 <Typography
                     variant="h6"
                     style={{

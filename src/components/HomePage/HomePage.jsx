@@ -14,24 +14,27 @@ import {
     InputLabel,
     List,
     ListItem,
-    ListItemText
+    ListItemText,
+    Tabs,
+    Tab
 } from '@mui/material';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { ThemeProvider } from '@mui/material/styles';
-import { theme } from '../colors'; // Importa el tema desde tu archivo configurado
+import { theme } from '../colors';
 
 const HomePage = () => {
     const [openModal, setOpenModal] = useState(false);
     const [transactions, setTransactions] = useState([]);
     const [totalSpent, setTotalSpent] = useState(0);
-    const [budget, setBudget] = useState(1000); // Presupuesto diario inicia
-    const [amountLeft, setAmountLeft] = useState(1000); // Presupuesto diario inicial
-    const [transactionData, setTransactionData] = useState({ amount: '', category: '', type: '' });
+    const [totalLoan, setTotalLoan] = useState(0);
+    const [budget, setBudget] = useState(1000);
+    const [amountLeft, setAmountLeft] = useState(1000);
+    const [transactionData, setTransactionData] = useState({ amount: '', category: '', type: 'Gasto', description: '' });
+    const [selectedTab, setSelectedTab] = useState(0);
 
-    // Colores para las categorías en el gráfico de pastel
-    const COLORS = ['#FFBB28', '#FF8042', '#0088FE', '#00C49F', '#FF6361'];
-    
-    // Actualización de la gráfica con los datos de transacciones
+    // Colores para las categorías en el gráfico de pastel, con más tonos de azul oscuro
+    const COLORS = ['#4B0082', '#8A2BE2', '#5D3FD3', '#4682B4', '#1E90FF', '#4169E1', '#6A5ACD', '#00BFFF', '#DB7093'];
+
     const data = transactions.reduce((acc, item) => {
         const existingCategory = acc.find(d => d.name === item.category);
         if (existingCategory) {
@@ -41,36 +44,52 @@ const HomePage = () => {
         }
         return acc;
     }, []);
-    
+
     const handleOpenModal = () => {
         setOpenModal(true);
     };
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        setTransactionData({ amount: '', category: '', type: '' });
+        setTransactionData({ amount: '', category: '', type: 'Gasto', description: '' });
     };
 
     const handleAddTransaction = () => {
         const amount = parseFloat(transactionData.amount);
         const newTransaction = {
-            amount,
-            category: transactionData.category,
-            type: transactionData.type
+            ...transactionData,
+            amount
         };
 
-        // Actualizar transacciones y el total
+        // Actualizar transacciones y el total según el tipo de transacción
         setTransactions([...transactions, newTransaction]);
-        setTotalSpent(totalSpent + amount);
-        setAmountLeft(budget - (totalSpent + amount));
+
+        if (transactionData.type === 'Gasto') {
+            setTotalSpent(totalSpent + amount);
+            setAmountLeft(budget - (totalSpent + amount + totalLoan));
+        } else {
+            setTotalLoan(totalLoan + amount);
+            setAmountLeft(budget - (totalSpent + totalLoan + amount));
+        }
+
         handleCloseModal();
     };
 
     const handleDeleteLast = () => {
         const lastTransaction = transactions.pop();
-        setTotalSpent(totalSpent - lastTransaction.amount);
-        setAmountLeft(budget - (totalSpent - lastTransaction.amount));
+        if (lastTransaction.type === 'Gasto') {
+            setTotalSpent(totalSpent - lastTransaction.amount);
+            setAmountLeft(budget - (totalSpent - lastTransaction.amount + totalLoan));
+        } else {
+            setTotalLoan(totalLoan - lastTransaction.amount);
+            setAmountLeft(budget - (totalSpent + totalLoan - lastTransaction.amount));
+        }
         setTransactions([...transactions]);
+    };
+
+    const handleTabChange = (event, newValue) => {
+        setSelectedTab(newValue);
+        setTransactionData({ ...transactionData, type: newValue === 0 ? 'Gasto' : 'Préstamo' });
     };
 
     return (
@@ -79,13 +98,26 @@ const HomePage = () => {
                 <Typography variant="h4" color="primary" gutterBottom>Resumen de Gastos</Typography>
 
                 <Typography variant="h6" color="textSecondary">
-                    Presupuesto Diario: ${budget.toFixed(2)} | Gastos: ${totalSpent.toFixed(2)} | Disponible: ${amountLeft.toFixed(2)}
+                    Presupuesto Diario: ${budget.toFixed(2)} | Gastos: ${totalSpent.toFixed(2)} | Préstamos: ${totalLoan.toFixed(2)} | Disponible: ${amountLeft.toFixed(2)}
                 </Typography>
 
                 {/* Gráfica de Pastel */}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
-                    <PieChart width={400} height={400}>
-                        <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={150} fill="#8884d8" label>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px', position: 'relative' }}>
+                    <PieChart width={350} height={350}>
+                        <Pie
+                            data={data}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={80}
+                            outerRadius={140}
+                            cornerRadius={10} // Bordes redondeados
+                            paddingAngle={4}
+                            startAngle={90}
+                            endAngle={450}
+                            label
+                        >
                             {data.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
@@ -95,30 +127,35 @@ const HomePage = () => {
                     <Box sx={{ position: 'absolute', top: 'calc(50% - 40px)', textAlign: 'center' }}>
                         <Typography variant="h5" color="success.main">${amountLeft.toFixed(2)}</Typography>
                         <Typography variant="subtitle1" color="error.main">Gastos: ${totalSpent.toFixed(2)}</Typography>
+                        <Typography variant="subtitle1" color="secondary.main">Préstamos: ${totalLoan.toFixed(2)}</Typography>
                     </Box>
                 </Box>
 
                 {/* Botones y Formulario de Agregar Transacción */}
                 <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
-                    <Button variant="contained" color="primary" onClick={handleOpenModal}>Agregar Gasto</Button>
+                    <Button variant="contained" color="primary" onClick={handleOpenModal}>Agregar Gasto o Préstamo</Button>
                     <Button variant="contained" color="secondary" sx={{ marginLeft: '10px' }} onClick={handleDeleteLast}>
-                        Eliminar Último Gasto
+                        Eliminar Último
                     </Button>
                 </Box>
 
                 {/* Lista de Categorías */}
                 <List sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px' }}>
-                    {data.map((item, index) => (
+                    {transactions.map((item, index) => (
                         <ListItem key={index}>
-                            <ListItemText primary={`${item.name}: $${item.value.toFixed(2)}`} />
+                            <ListItemText primary={`${item.category} (${item.type}): $${item.amount.toFixed(2)} - ${item.description || 'Sin descripción'}`} />
                         </ListItem>
                     ))}
                 </List>
 
                 {/* Modal para Agregar Nueva Transacción */}
                 <Dialog open={openModal} onClose={handleCloseModal}>
-                    <DialogTitle>Agregar Gasto</DialogTitle>
+                    <DialogTitle>Agregar Gasto o Préstamo</DialogTitle>
                     <DialogContent>
+                        <Tabs value={selectedTab} onChange={handleTabChange} centered>
+                            <Tab label="Agregar Gasto" />
+                            <Tab label="Agregar Préstamo" />
+                        </Tabs>
                         <TextField
                             label="Monto"
                             type="number"
@@ -140,16 +177,14 @@ const HomePage = () => {
                                 <MenuItem value="Regalos">Regalos</MenuItem>
                             </Select>
                         </FormControl>
-                        <FormControl fullWidth margin="dense">
-                            <InputLabel>Tipo</InputLabel>
-                            <Select
-                                value={transactionData.type}
-                                onChange={(e) => setTransactionData({ ...transactionData, type: e.target.value })}
-                            >
-                                <MenuItem value="Gasto">Gasto</MenuItem>
-                                <MenuItem value="Préstamo">Préstamo</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <TextField
+                            label="Descripción (opcional)"
+                            type="text"
+                            fullWidth
+                            margin="dense"
+                            value={transactionData.description}
+                            onChange={(e) => setTransactionData({ ...transactionData, description: e.target.value })}
+                        />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseModal} color="secondary">Cancelar</Button>
