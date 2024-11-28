@@ -26,8 +26,8 @@ const SavingsChart = () => {
     }));
 
     const chartSetting = {
-        width: 600,
-        height: 400,
+        width: 300,
+        height: 300,
         xAxis: [{ scaleType: 'band', dataKey: 'month' }],
         yAxis: [
             {
@@ -42,8 +42,8 @@ const SavingsChart = () => {
     };
 
     return (
-        <div>
-            <h2 style={{ color: '#0F2532', width: '500px', textAlign: 'center' }}>Distribución de Ahorros</h2> {/* Aquí puedes cambiar el color según tu tema */}
+        <div style={{width: '280px', margin: '0 auto'}}>
+            <h2 style={{ color: '#0F2532', width: '100%', textAlign: 'center' }}>Distribución de Ahorros</h2> {/* Aquí puedes cambiar el color según tu tema */}
             <LineChart
                 dataset={dataset} // Asegúrate de incluir el dataset aquí
                 series={[
