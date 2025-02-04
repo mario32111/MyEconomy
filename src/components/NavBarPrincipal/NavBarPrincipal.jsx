@@ -111,7 +111,11 @@ const NavBarPrincipal = ({ children, footer }) => {
     const [checked, setChecked] = useState(true); // Estado para el control de la animación
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh', // Asegura que el contenedor ocupe toda la altura de la ventana
+        }}>
             <CssBaseline />
 
             <Slide in={checked} timeout={500}>
@@ -269,18 +273,19 @@ const NavBarPrincipal = ({ children, footer }) => {
                 </List>
             </Drawer>
             <Box
-                component="main"
                 sx={{
                     flexGrow: 1,
-                    bgcolor: theme.palette.background.default,
-                    marginLeft: isDrawerOpen ? `${drawerWidth}px` : '0',
-                    transition: 'margin 0.3s ease-in-out',
+                    padding: (theme) => theme.spacing(3),
+                    marginTop: '64px', // Altura de la AppBar
+                    bgcolor: '#f0f0f0', // Fondo del contenido principal
                 }}
             >
                 <Toolbar />
                 {children}
-                {footer}
-                </Box>
+            </Box>
+
+            {/* Footer fijo */}
+            {footer}
         </Box>
 
 
