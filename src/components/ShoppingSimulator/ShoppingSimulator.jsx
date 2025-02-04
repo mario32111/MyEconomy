@@ -1,231 +1,260 @@
-import React, { useState } from 'react';
-import { Box, Typography, Grid, Button, TextField, List, ListItem, ListItemText, FormControl, Select, MenuItem } from '@mui/material';
+import React, { useState, useRef, useEffect } from 'react';
+import { Button, Box, Typography } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../colors';
-import { Slide } from '@mui/material';
 
-const ShoppingSimulator = () => {
-    const [checked, setChecked] = useState(true);
-    const [cart, setCart] = useState([]);
-    const [total, setTotal] = useState(0);
-    const [store, setStore] = useState('');
-    const [cashPrice, setCashPrice] = useState('');
-    const [weeks, setWeeks] = useState('');
-    const [weeklyPayment, setWeeklyPayment] = useState('');
-    const [history, setHistory] = useState([]);
-
-    // Función para calcular el total a crédito y las estadísticas
-    const calculateStats = () => { 
-        const cash = parseFloat(cashPrice);
-        const creditTotal = parseFloat(weeks) * parseFloat(weeklyPayment);
-        const increase = creditTotal - cash;
-        const increasePercentage = ((increase / cash) * 100).toFixed(2);
-
-        return {
-            creditTotal,
-            increase,
-            increasePercentage,
-        };
-    };
-
-    // Agregar producto al carrito con estadísticas
-    const addToCart = () => {
-        if (store && cashPrice && weeks && weeklyPayment) {
-            const { creditTotal, increase, increasePercentage } = calculateStats();
-            const product = {
-                id: cart.length + 1,
-                store,
-                cashPrice: parseFloat(cashPrice),
-                creditTotal,
-                weeks: parseInt(weeks),
-                weeklyPayment: parseFloat(weeklyPayment),
-                increase,
-                increasePercentage,
-                version: 1
+const RealTimeAudioToText = () => {
+    const [isListening, setIsListening] = useState(false);
+    const [finalTranscription, setFinalTranscription] = useState("");
+    const [interimTranscription, setInterimTranscription] = useState("");
+    const [detectedCategories, setDetectedCategories] = useState([]);
+    const recognitionRef = useRef(null);
+    useEffect(() => {
+        if ("webkitSpeechRecognition" in window && !recognitionRef.current) {
+            const SpeechRecognition = window.webkitSpeechRecognition;
+            recognitionRef.current = new SpeechRecognition();
+            recognitionRef.current.continuous = true;
+            recognitionRef.current.interimResults = true;
+            recognitionRef.current.lang = "es-ES";
+            recognitionRef.current.onresult = (event) => {
+                let interim = "";
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        const processedText = processSpokenText(event.results[i][0].transcript);
+                        setFinalTranscription((prev) => prev + processedText + " ");
+                        const categories = extractCategories(processedText);
+                        if (categories.length > 0) {
+                            setDetectedCategories((prev) => [...prev, ...categories]);
+                        }
+                    } else {
+                        interim += processSpokenText(event.results[i][0].transcript);
+                    }
+                }
+                setInterimTranscription(interim);
             };
-
-            setCart([...cart, product]);
-            setTotal(total + creditTotal);
-            setStore('');
-            setCashPrice('');
-            setWeeks('');
-            setWeeklyPayment('');
+            recognitionRef.current.onerror = (event) => {
+                console.error("Speech recognition error:", event.error);
+                setIsListening(false);
+            };
+            recognitionRef.current.onend = () => {
+                if (isListening) {
+                    try {
+                        recognitionRef.current.start();
+                    } catch (error) {
+                        console.error("Failed to restart recognition:", error);
+                    }
+                }
+            };
+        } else if (!("webkitSpeechRecognition" in window)) {
+            alert("Speech recognition is not supported in this browser. Please use Google Chrome.");
         }
+    }, [isListening]);
+    const processSpokenText = (text) => {
+        const replacements = {
+            uno: "1", dos: "2", tres: "3", cuatro: "4", cinco: "5", seis: "6", siete: "7", ocho: "8", nueve: "9", cero: "0", coma: ",", punto: ".", "punto y coma": ";",
+        };
+        return text
+            .toLowerCase()
+            .trim()
+            .split(/\s+/)
+            .map((word) => replacements[word] || word)
+            .join(" ");
     };
-
-    // Editar un producto del carrito
-    const editCartItem = (productId) => {
-        const product = cart[productId];
-        setStore(product.store);
-        setCashPrice(product.cashPrice.toString());
-        setWeeks(product.weeks.toString());
-        setWeeklyPayment(product.weeklyPayment.toString());
-        
-        // Guardar la versión previa en el historial
-        setHistory([...history, { ...product, version: product.version }]);
-    };
-
-    // Actualizar producto modificado en el carrito
-    const updateCartItem = (productId) => {
-        const updatedCart = cart.map((item, index) => {
-            if (index === productId) {
-                const { creditTotal, increase, increasePercentage } = calculateStats();
-                return {
-                    ...item,
-                    store,
-                    cashPrice: parseFloat(cashPrice),
-                    weeks: parseInt(weeks),
-                    weeklyPayment: parseFloat(weeklyPayment),
-                    creditTotal,
-                    increase,
-                    increasePercentage,
-                    version: item.version + 1 // Incrementar la versión del producto
-                };
+    const extractCategories = (text) => {
+        const predefinedCategories = [
+            "Restaurante",
+            "Transporte",
+            "Renta",
+            "Servicios",
+            "Entretenimiento",
+            "Préstamo"
+        ];
+        // Dividir el texto por comas y procesar cada fragmento
+        const fragments = text.split(",").map((fragment) => fragment.trim());
+        const matches = [];
+        fragments.forEach((fragment) => {
+            const categoryRegex = /(?:\$?(\d+(?:\.\d{1,2})?)\s*(?:pesos|))\s*(?:en|para|de)\s*([\w\s]+)(?:\s+(porque|ya que|por|debido a)\s+(.+))?/gi;
+            let match;
+    
+            // Intentar encontrar coincidencias en cada fragmento
+            while ((match = categoryRegex.exec(fragment)) !== null) {
+                const [, amount, rawCategory, , rawDescription] = match;
+                let detectedCategory = predefinedCategories.find((category) =>
+                    rawCategory.toLowerCase().includes(category.toLowerCase())
+                );
+                if (!detectedCategory) {
+                    detectedCategory = "Otra";
+                }
+                // Descripción: incluir el texto completo sin monto ni categoría detectada
+                const description = fragment
+                    .replace(new RegExp(`\\$?${amount}`, "g"), "")
+                    .replace(new RegExp(detectedCategory, "i"), "")
+                    .trim();
+                matches.push({
+                    amount: parseFloat(amount),
+                    category: detectedCategory,
+                    description: description || "Sin descripción",
+                });
             }
-            return item;
         });
-        
-        setCart(updatedCart);
-        setTotal(updatedCart.reduce((acc, item) => acc + item.creditTotal, 0));
-        setStore('');
-        setCashPrice('');
-        setWeeks('');
-        setWeeklyPayment('');
+        return matches.length > 0 ? matches : [];
     };
-
+    const toggleListening = () => {
+        if (!recognitionRef.current) return;
+        if (isListening) {
+            recognitionRef.current.stop();
+            setFinalTranscription((prev) => prev.trimEnd() + ".");
+        } else {
+            try {
+                recognitionRef.current.start();
+                setFinalTranscription("");
+                setInterimTranscription("");
+                setDetectedCategories([]);
+            } catch (error) {
+                console.error("Failed to start recognition:", error);
+            }
+        }
+        setIsListening(!isListening);
+    };
     return (
         <ThemeProvider theme={theme}>
-<Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
-    <Typography variant="h5" color="primary" gutterBottom>
-        Simulador de Intereses a Meses
-    </Typography>
-
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                        <Slide in={checked} timeout={500}>
-                            <Box>
-                                <Typography variant="h6" color="secondary" gutterBottom>
-                                    Ingresar Detalles del Producto
-                                </Typography>
-                                <FormControl fullWidth margin="normal">
-                                    <Select value={store} onChange={(e) => setStore(e.target.value)} displayEmpty>
-                                        <MenuItem value="">Seleccionar Tienda</MenuItem>
-                                        <MenuItem value="Elektra">Elektra</MenuItem>
-                                        <MenuItem value="Coppel">Coppel</MenuItem>
-                                        <MenuItem value="Liverpool">Liverpool</MenuItem>
-
-                                    </Select>
-                                </FormControl>
-                                <TextField
-                                    label="Precio al Contado"
-                                    type="number"
-                                    value={cashPrice}
-                                    onChange={(e) => setCashPrice(e.target.value)}
-                                    fullWidth
-                                    margin="normal"
-                                />
-                                <TextField
-                                    label="Número de Semanas"
-                                    type="number"
-                                    value={weeks}
-                                    onChange={(e) => setWeeks(e.target.value)}
-                                    fullWidth
-                                    margin="normal"
-                                />
-                                <TextField
-                                    label="Pago Semanal"
-                                    type="number"
-                                    value={weeklyPayment}
-                                    onChange={(e) => setWeeklyPayment(e.target.value)}
-                                    fullWidth
-                                    margin="normal"
-                                />
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={addToCart}
-                                    fullWidth
-                                    sx={{ marginTop: '10px' }}
-                                >
-                                    Agregar al Carrito
-                                </Button>
-                            </Box>
-                        </Slide>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                        <Slide in={checked} direction="up" timeout={500}>
-                            <Box>
-                                <Typography variant="h6" color="secondary" gutterBottom>
-                                    Carrito de Compras
-                                </Typography>
-                                <List>
-                                    {cart.length === 0 ? (
-                                        <Typography variant="body1" color="text.secondary">
-                                            El carrito está vacío.
-                                        </Typography>
-                                    ) : (
-                                        cart.map((item, index) => (
-                                            <ListItem key={index} divider>
-                                                <ListItemText
-                                                    primary={`${item.store}: $${item.cashPrice.toFixed(2)} al contado (Versión: ${item.version})`}
-                                                    secondary={`A crédito: $${item.creditTotal.toFixed(2)} | Aumento: ${item.increasePercentage}% | Diferencia: $${item.increase.toFixed(2)}`}
-                                                />
-                                                <Button
-                                                    size="small"
-                                                    color="secondary"
-                                                    onClick={() => editCartItem(index)}
-                                                >
-                                                    Editar
-                                                </Button>
-                                                <Button
-                                                    size="small"
-                                                    color="primary"
-                                                    onClick={() => updateCartItem(index)}
-                                                    disabled={store === '' || cashPrice === '' || weeks === '' || weeklyPayment === ''}
-                                                >
-                                                    Actualizar
-                                                </Button>
-                                            </ListItem>
-                                        ))
-                                    )}
-                                </List>
-                                <Typography variant="h6" color="primary" sx={{ marginTop: '20px' }}>
-                                    Total: ${total.toFixed(2)}
-                                </Typography>
-                            </Box>
-                        </Slide>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <Slide in={checked} direction="up" timeout={500}>
-                            <Box>
-                                <Typography variant="h6" color="secondary" gutterBottom>
-                                    Historial de Modificaciones
-                                </Typography>
-                                <List>
-                                    {history.length === 0 ? (
-                                        <Typography variant="body1" color="text.secondary">
-                                            No hay historial.
-                                        </Typography>
-                                    ) : (
-                                        history.map((item, index) => (
-                                            <ListItem key={index} divider>
-                                                <ListItemText
-                                                    primary={`${item.store}: $${item.cashPrice.toFixed(2)} al contado (Versión: ${item.version})`}
-                                                    secondary={`A crédito: $${item.creditTotal.toFixed(2)} | Aumento: ${item.increasePercentage}% | Diferencia: $${item.increase.toFixed(2)}`}
-                                                />
-                                            </ListItem>
-                                        ))
-                                    )}
-                                </List>
-                            </Box>
-                        </Slide>
-                    </Grid>
-                </Grid>
+            <Box
+                sx={{
+                    padding: '20px',
+                    marginTop: '30px',
+                    maxWidth: '600px',
+                    margin: '0 auto',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    height: '90vh',
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '10px',
+                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)'
+                }}
+            >
+                <Typography variant="h5" color="primary" gutterBottom>
+                    Audio a Texto
+                </Typography>
+                <Box
+                    sx={{
+                        padding: '10px',
+                        border: '1px solid #ccc',
+                        borderRadius: '10px',
+                        backgroundColor: '#ffffff',
+                        textAlign: 'left',
+                        minHeight: '300px',
+                        width: '100%',
+                        overflowY: 'auto',
+                        fontFamily: 'monospace',
+                        fontSize: '16px',
+                        lineHeight: '1.5',
+                        position: 'relative'
+                    }}
+                >
+                    <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        component="pre"
+                        style={{
+                            whiteSpace: 'pre-wrap',
+                            wordWrap: 'break-word',
+                        }}
+                    >
+                        {finalTranscription + interimTranscription}
+                    </Typography>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: '10px',
+                            right: '10px',
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            backgroundColor: isListening ? '#4caf50' : '#ccc',
+                            animation: isListening ? 'blink 1s infinite' : 'none',
+                            '@keyframes blink': {
+                                '0%': { opacity: 1 },
+                                '50%': { opacity: 0.5 },
+                                '100%': { opacity: 1 }
+                            }
+                        }}
+                    />
+                </Box>
+                <Box
+                    sx={{
+                        marginTop: '20px',
+                        width: '100%',
+                        padding: '10px',
+                        backgroundColor: '#e8f5e9',
+                        borderRadius: '10px',
+                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)'
+                    }}
+                >
+                    <Typography variant="h6" color="primary" gutterBottom>
+                        Categorías Detectadas
+                    </Typography>
+                    {detectedCategories.length > 0 ? (
+                        <Box
+                            component="table"
+                            sx={{
+                                width: '100%',
+                                borderCollapse: 'collapse',
+                                textAlign: 'left',
+                                backgroundColor: '#fff',
+                                border: '1px solid #ccc',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                            }}
+                        >
+                            <thead>
+                                <tr>
+                                    <th style={{ border: '1px solid #ccc', padding: '8px', backgroundColor: '#f5f5f5' }}>Monto</th>
+                                    <th style={{ border: '1px solid #ccc', padding: '8px', backgroundColor: '#f5f5f5' }}>Categoría</th>
+                                    <th style={{ border: '1px solid #ccc', padding: '8px', backgroundColor: '#f5f5f5' }}>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {detectedCategories.map((category, index) => (
+                                    <tr key={index}>
+                                        <td style={{ border: '1px solid #ccc', padding: '8px' }}>${category.amount.toFixed(2)}</td>
+                                        <td style={{ border: '1px solid #ccc', padding: '8px' }}>{category.category}</td>
+                                        <td style={{ border: '1px solid #ccc', padding: '8px' }}>{category.description}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Box>
+                    ) : (
+                        <Typography variant="body2" color="text.secondary">
+                            No se han detectado categorías aún.
+                        </Typography>
+                    )}
+                </Box>
+                <Button
+                    variant="contained"
+                    color={isListening ? "secondary" : "primary"}
+                    onClick={toggleListening}
+                    sx={{
+                        width: '70px',
+                        height: '70px',
+                        borderRadius: '50%',
+                        backgroundColor: isListening ? '#ff4d4d' : '#4caf50',
+                        color: '#fff',
+                        fontSize: '16px',
+                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: '20px'
+                    }}
+                >
+                    {isListening ? "Parar" : "Inicio"}
+                </Button>
             </Box>
         </ThemeProvider>
     );
 };
-
-export default ShoppingSimulator;
+export default RealTimeAudioToText;
