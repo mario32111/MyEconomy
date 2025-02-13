@@ -20,7 +20,7 @@ import InventoryApp from '../components/Inventario/InventoryApp';
 import InterestRateComparison from '../components/ComparacionTazas/Comparacion';
 import BudgetPlanner from '../components/Presupuesto/BudgetPlanner';
 import IndexLoader from '../components/LandingBootstrap/IndexLoader';
-
+import MicModalWindow from '../components/HomePage/MicModal'
 export const useNavigation = () => {
     const navigate = useNavigate();
 
@@ -42,7 +42,7 @@ export const AppRoutes = () => {
         { path: '/soporte', element: <SupportSection /> },
         { path: '/simulador-compras', element: <ShoppingSimulator /> },
         { path: '/ajustes', element: <SettingsSection /> },
-        { path: '/Home', element: <HomePage /> },
+        { path: '/Home', element: <HomePage MicModalWindow= {MicModalWindow}/> },
         { path: '/chatai', element: <ChatAI /> },
         { path: '/monitoreo', element: <Monitoreo /> },
         { path: '/loggin', element: <Loggin /> },

@@ -19,22 +19,29 @@ import {
     Tab,
     IconButton
 } from '@mui/material';
+
+import MicIcon from '@mui/icons-material/Mic';
+import RealTimeAudioToText from './MicModal'
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { ThemeProvider } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { theme } from '../colors';
 
-const HomePage = () => {
+const HomePage = ({ MicModalWindow }) => {
     const [openModal, setOpenModal] = useState(false);
     const [transactions, setTransactions] = useState([]);
     const [totalSpent, setTotalSpent] = useState(0);
     const [totalLoan, setTotalLoan] = useState(0);
-    const [budget, setBudget] = useState(1000); 
+    const [budget, setBudget] = useState(1000);
     const [amountLeft, setAmountLeft] = useState(1000);
     const [transactionData, setTransactionData] = useState({ amount: '', category: '', type: 'Gasto', description: '', phone: '' });
     const [selectedTab, setSelectedTab] = useState(0);
     const [editingIndex, setEditingIndex] = useState(null);
+    const [openMicModal, setOpenMicModal] = useState(false);
+
+    const handleOpenMicModal = () => setOpenMicModal(true);
+    const handleCloseMicModal = () => setOpenMicModal(false);
 
 
     const COLORS = ['#4B0082', '#8A2BE2', '#5D3FD3', '#4682B4', '#1E90FF', '#4169E1', '#6A5ACD', '#00BFFF'];
@@ -127,9 +134,9 @@ const HomePage = () => {
             <Box sx={{ padding: '20px', backgroundColor: theme.palette.background.default, maxWidth: '1000px', margin: '0 auto' }}>
                 <Typography variant="h4" color="primary" gutterBottom>Resumen de Gastos</Typography>
                 <Typography variant="h6" color="textSecondary" sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'nowrap' }}>
-                    Presupuesto Diario: ${budget.toFixed(2)} | 
-                    <span style={{ color: 'red' }}>Gastos: ${totalSpent.toFixed(2)}</span> | 
-                    <span style={{ color: '#FF69B4' }}>Préstamos: ${totalLoan.toFixed(2)}</span> | 
+                    Presupuesto Diario: ${budget.toFixed(2)} |
+                    <span style={{ color: 'red' }}>Gastos: ${totalSpent.toFixed(2)}</span> |
+                    <span style={{ color: '#FF69B4' }}>Préstamos: ${totalLoan.toFixed(2)}</span> |
                     <span style={{ color: 'green' }}>Disponible: ${amountLeft.toFixed(2)}</span>
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px', position: 'relative' }}>
@@ -163,6 +170,22 @@ const HomePage = () => {
                 </Box>
                 <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
                     <Button variant="contained" color="primary" onClick={() => handleOpenModal()}>Agregar Gasto o Préstamo</Button>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            backgroundColor: 'red',
+                            borderRadius: '50%',  // Hace que el botón sea completamente redondo
+                            width: '40px',
+                            height: '40px',
+                            minWidth: '40px' // Asegura que no se expanda
+                        }}
+                        onClick={handleOpenMicModal}
+                    >
+                        <RealTimeAudioToText openModal={openMicModal} handleCloseModal={handleCloseMicModal} />
+
+                        <MicIcon sx={{ color: 'white' }} /> {/* Icono de micrófono */}
+                    </Button>
+
                 </Box>
                 <List sx={{ marginTop: '20px' }}>
                     {transactions.map((item, index) => (
@@ -185,6 +208,7 @@ const HomePage = () => {
                         </ListItem>
                     ))}
                 </List>
+                {openMicModal && <MicModalWindow />}
                 <Dialog open={openModal} onClose={handleCloseModal}>
                     <DialogTitle>{editingIndex !== null ? 'Editar Transacción' : 'Agregar Gasto o Préstamo'}</DialogTitle>
                     <DialogContent>
