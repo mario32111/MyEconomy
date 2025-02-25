@@ -13,22 +13,17 @@ const ShoppingSimulator = () => {
     const [weeks, setWeeks] = useState('');
     const [weeklyPayment, setWeeklyPayment] = useState('');
     const [history, setHistory] = useState([]);
-
-    // Función para calcular el total a crédito y las estadísticas
     const calculateStats = () => { 
         const cash = parseFloat(cashPrice);
         const creditTotal = parseFloat(weeks) * parseFloat(weeklyPayment);
         const increase = creditTotal - cash;
         const increasePercentage = ((increase / cash) * 100).toFixed(2);
-
         return {
             creditTotal,
             increase,
             increasePercentage,
         };
     };
-
-    // Agregar producto al carrito con estadísticas
     const addToCart = () => {
         if (store && cashPrice && weeks && weeklyPayment) {
             const { creditTotal, increase, increasePercentage } = calculateStats();
@@ -43,7 +38,6 @@ const ShoppingSimulator = () => {
                 increasePercentage,
                 version: 1
             };
-
             setCart([...cart, product]);
             setTotal(total + creditTotal);
             setStore('');
@@ -52,20 +46,14 @@ const ShoppingSimulator = () => {
             setWeeklyPayment('');
         }
     };
-
-    // Editar un producto del carrito
     const editCartItem = (productId) => {
         const product = cart[productId];
         setStore(product.store);
         setCashPrice(product.cashPrice.toString());
         setWeeks(product.weeks.toString());
         setWeeklyPayment(product.weeklyPayment.toString());
-        
-        // Guardar la versión previa en el historial
         setHistory([...history, { ...product, version: product.version }]);
     };
-
-    // Actualizar producto modificado en el carrito
     const updateCartItem = (productId) => {
         const updatedCart = cart.map((item, index) => {
             if (index === productId) {
@@ -79,12 +67,11 @@ const ShoppingSimulator = () => {
                     creditTotal,
                     increase,
                     increasePercentage,
-                    version: item.version + 1 // Incrementar la versión del producto
+                    version: item.version + 1
                 };
             }
             return item;
         });
-        
         setCart(updatedCart);
         setTotal(updatedCart.reduce((acc, item) => acc + item.creditTotal, 0));
         setStore('');
@@ -92,14 +79,12 @@ const ShoppingSimulator = () => {
         setWeeks('');
         setWeeklyPayment('');
     };
-
     return (
         <ThemeProvider theme={theme}>
 <Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
     <Typography variant="h5" color="primary" gutterBottom>
         Simulador de Intereses a Meses
     </Typography>
-
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                         <Slide in={checked} timeout={500}>
@@ -113,7 +98,6 @@ const ShoppingSimulator = () => {
                                         <MenuItem value="Elektra">Elektra</MenuItem>
                                         <MenuItem value="Coppel">Coppel</MenuItem>
                                         <MenuItem value="Liverpool">Liverpool</MenuItem>
-
                                     </Select>
                                 </FormControl>
                                 <TextField
@@ -152,7 +136,6 @@ const ShoppingSimulator = () => {
                             </Box>
                         </Slide>
                     </Grid>
-
                     <Grid item xs={12} md={6}>
                         <Slide in={checked} direction="up" timeout={500}>
                             <Box>
@@ -196,7 +179,6 @@ const ShoppingSimulator = () => {
                             </Box>
                         </Slide>
                     </Grid>
-
                     <Grid item xs={12}>
                         <Slide in={checked} direction="up" timeout={500}>
                             <Box>
@@ -227,5 +209,4 @@ const ShoppingSimulator = () => {
         </ThemeProvider>
     );
 };
-
 export default ShoppingSimulator;

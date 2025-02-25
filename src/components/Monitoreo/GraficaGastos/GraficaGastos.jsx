@@ -12,34 +12,26 @@ const ExpenseChart = () => {
         { category: 'Salud', amount: 120, date: '2024-09-20' },
         { category: 'Otros', amount: 50, date: '2024-09-25' },
     ];
-
     const [amountThreshold, setAmountThreshold] = useState(0);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-
     const filteredData = allData.filter((item) => {
         const date = new Date(item.date);
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
-
         const withinAmountRange = item.amount >= amountThreshold;
         const withinDateRange = (!start || date >= start) && (!end || date <= end);
-
         return withinAmountRange && withinDateRange;
     });
-
     const chartData = filteredData.map((item, index) => ({
         id: index,
         value: item.amount,
         label: item.category,
     }));
-
     const totalExpense = filteredData.reduce((sum, item) => sum + item.amount, 0);
-
     return (
         <Box style={{ width: '280px', margin: '0 auto', position: 'relative' }}>
             <h2 style={{ color: '#0F2532', width: '100%', textAlign: 'center', margin: '0 auto' }}>Distribución de Gastos</h2>
-
             <TextField
                 type="number"
                 label="Gastos Mínimos"
@@ -50,7 +42,6 @@ const ExpenseChart = () => {
                 margin="normal"
                 style={{ width: '120px' }}
             />
-
             <Box display="flex" alignItems="center" gap={2} marginBottom={2}>
                 <TextField
                     type="date"
@@ -75,7 +66,6 @@ const ExpenseChart = () => {
                     }}
                 />
             </Box>
-
             <Box style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <PieChart
                     series={[{
@@ -92,7 +82,6 @@ const ExpenseChart = () => {
                     width={280}
                     height={750}
                 />
-                
                 <Typography
                     variant="h6"
                     style={{
@@ -110,5 +99,4 @@ const ExpenseChart = () => {
         </Box>
     );
 };
-
 export default ExpenseChart;

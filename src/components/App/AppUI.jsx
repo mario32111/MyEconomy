@@ -3,10 +3,8 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import { AppRoutes } from '../../hooks/useNavigation'; // Importa AppRoutes y el hook de navegación
 import NavBarPrincipal from '../NavBarPrincipal/NavBarPrincipal'; // Importa NavBarPrincipal
 import MiniFooter from '../MiniFooter/MiniFooter'
-
 function AppUI() {
     const location = useLocation(); // Obtiene la ubicación actual
-
     // Condiciona el renderizado basado en la ruta
     return (
         <>
@@ -20,7 +18,6 @@ function AppUI() {
         </>
     );
 }
-
 // Envolver AppUI dentro de BrowserRouter
 function Main() {
     return (
@@ -29,5 +26,4 @@ function Main() {
         </BrowserRouter>
     );
 }
-
 export { Main as AppUI };
