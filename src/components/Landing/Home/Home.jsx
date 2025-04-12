@@ -182,7 +182,7 @@ export const Home = () => {
             <Icon><FaArrowCircleRight /></Icon>
             <h3>
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-              <a href="#">Ver más ...</a>
+              <a href="#">Y mucho mas ...</a>
             </h3>
           </IconBox>
         </Grow>

@@ -32,6 +32,8 @@ const RecordatoriosSeguimiento = () => {
         <Typography variant="h4" color="text.primary" gutterBottom>
           Recordatorios y Seguimiento
         </Typography>
+        
+        {/* Entrada para el tipo de recordatorio */}
         <TextField
           label="Tipo de Recordatorio"
           variant="outlined"
@@ -40,6 +42,8 @@ const RecordatoriosSeguimiento = () => {
           onChange={(e) => setTipoRecordatorio(e.target.value)}
           style={{ marginBottom: '20px' }}
         />
+        
+        {/* Entrada para la fecha */}
         <TextField
           label="Fecha (YYYY-MM-DD)"
           variant="outlined"
@@ -49,6 +53,8 @@ const RecordatoriosSeguimiento = () => {
           onChange={(e) => setFechaRecordatorio(e.target.value)}
           style={{ marginBottom: '20px' }}
         />
+        
+        {/* Entrada para la hora */}
         <TextField
           label="Hora (HH:MM)"
           variant="outlined"
@@ -58,6 +64,8 @@ const RecordatoriosSeguimiento = () => {
           onChange={(e) => setHoraRecordatorio(e.target.value)}
           style={{ marginBottom: '20px' }}
         />
+        
+        {/* Botón para guardar el recordatorio */}
         <Button
           variant="contained"
           color="primary"
@@ -67,9 +75,12 @@ const RecordatoriosSeguimiento = () => {
           Guardar Recordatorio
         </Button>
 
+        {/* Título para la lista de recordatorios */}
         <Typography variant="h5" color="text.secondary" style={{ marginTop: '20px' }}>
           Lista de Recordatorios:
         </Typography>
+
+        {/* Mapeo de recordatorios para mostrar en la lista */}
         {recordatorios.map((recordatorio, index) => (
           <Typography key={index} variant="body1" color="text.primary">
             {recordatorio.tipo} - {recordatorio.fecha} a las {recordatorio.hora}

@@ -12,8 +12,8 @@ export default function BudgetPieChart() {
     ];
 
     return (
-        <div>
-            <h2 style={{ color: '#0F2532', width: '500px', textAlign: 'center' }}>Distribución de Presupuesto</h2> {/* Aquí puedes cambiar el color según tu tema */}
+        <div style={{width: '280px', margin: '0 auto'}}>
+            <h2 style={{ color: '#0F2532', width: '100%', textAlign: 'center' }}>Distribución de Presupuesto</h2> {/* Aquí puedes cambiar el color según tu tema */}
 
             <PieChart
                 series={[{
@@ -27,8 +27,8 @@ export default function BudgetPieChart() {
                     cx: 150,
                     cy: 150,
                 }]}
-                width={500}
-                height={500}
+                width={280}
+                height={750}
             />
         </div>
     );
