@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Button, TextField, List, ListItem, ListItemText, FormControl, Select, MenuItem } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../colors';
@@ -13,7 +13,25 @@ const ShoppingSimulator = () => {
     const [weeks, setWeeks] = useState('');
     const [weeklyPayment, setWeeklyPayment] = useState('');
     const [history, setHistory] = useState([]);
-    const calculateStats = () => { 
+
+    // Cargar datos desde Local Storage al iniciar
+    useEffect(() => {
+        const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
+        const savedHistory = JSON.parse(localStorage.getItem('history')) || [];
+        const savedTotal = savedCart.reduce((acc, item) => acc + item.creditTotal, 0);
+
+        setCart(savedCart);
+        setHistory(savedHistory);
+        setTotal(savedTotal);
+    }, []);
+
+    // Guardar datos en Local Storage cuando cambien
+    useEffect(() => {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem('history', JSON.stringify(history));
+    }, [cart, history]);
+
+    const calculateStats = () => {
         const cash = parseFloat(cashPrice);
         const creditTotal = parseFloat(weeks) * parseFloat(weeklyPayment);
         const increase = creditTotal - cash;
@@ -24,6 +42,7 @@ const ShoppingSimulator = () => {
             increasePercentage,
         };
     };
+
     const addToCart = () => {
         if (store && cashPrice && weeks && weeklyPayment) {
             const { creditTotal, increase, increasePercentage } = calculateStats();
@@ -38,7 +57,8 @@ const ShoppingSimulator = () => {
                 increasePercentage,
                 version: 1
             };
-            setCart([...cart, product]);
+            const newCart = [...cart, product];
+            setCart(newCart);
             setTotal(total + creditTotal);
             setStore('');
             setCashPrice('');
@@ -46,6 +66,7 @@ const ShoppingSimulator = () => {
             setWeeklyPayment('');
         }
     };
+
     const editCartItem = (productId) => {
         const product = cart[productId];
         setStore(product.store);
@@ -54,6 +75,7 @@ const ShoppingSimulator = () => {
         setWeeklyPayment(product.weeklyPayment.toString());
         setHistory([...history, { ...product, version: product.version }]);
     };
+
     const updateCartItem = (productId) => {
         const updatedCart = cart.map((item, index) => {
             if (index === productId) {
@@ -79,12 +101,13 @@ const ShoppingSimulator = () => {
         setWeeks('');
         setWeeklyPayment('');
     };
+
     return (
         <ThemeProvider theme={theme}>
-<Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
-    <Typography variant="h5" color="primary" gutterBottom>
-        Simulador de Intereses a Meses
-    </Typography>
+            <Box sx={{ padding: '20px', marginTop: '30px', maxWidth: '800px', margin: '0 auto' }}>
+                <Typography variant="h5" color="primary" gutterBottom>
+                    Simulador de Intereses a Meses
+                </Typography>
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                         <Slide in={checked} timeout={500}>
@@ -209,4 +232,5 @@ const ShoppingSimulator = () => {
         </ThemeProvider>
     );
 };
+
 export default ShoppingSimulator;

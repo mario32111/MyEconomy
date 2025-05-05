@@ -4,8 +4,7 @@ import { AppRoutes } from '../../hooks/useNavigation'; // Importa AppRoutes y el
 import NavBarPrincipal from '../NavBarPrincipal/NavBarPrincipal'; // Importa NavBarPrincipal
 import MiniFooter from '../MiniFooter/MiniFooter'
 function AppUI() {
-    const location = useLocation(); // Obtiene la ubicación actual
-    // Condiciona el renderizado basado en la ruta
+    const location = useLocation(); 
     return (
         <>
             { location.pathname === '/prueba' || location.pathname === '/new-password' || location.pathname === '/no-password' || location.pathname === '/' || location.pathname === '/loggin' || location.pathname === '/sign-up' ? (

@@ -1,20 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    Box,
-    Typography,
-    Tabs,
-    Tab,
-    TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-} from '@mui/material';
+import {Dialog,DialogTitle,DialogContent,DialogActions,Button,Box,Typography,Tabs,Tab,TextField,FormControl,InputLabel,Select,MenuItem,} from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../colors';
 

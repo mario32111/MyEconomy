@@ -1,52 +1,17 @@
 import React, { useState } from 'react';
-import {
-    AppBar,
-    Toolbar,
-    IconButton,
-    Typography,
-    Drawer,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Divider,
-    CssBaseline,
-    Box,
-    useTheme,
-    useMediaQuery,
-    Menu,
-    MenuItem,
-    Popover,
+import {AppBar,Toolbar,IconButton,Typography,Drawer,List,ListItem,ListItemIcon,ListItemText,Divider,
+    CssBaseline,Box,useTheme,useMediaQuery,Menu,MenuItem,Popover,
 } from '@mui/material';
-import {
-    Home,
-    Chat,
-    Build,
-    School,
-    TrendingUp,
-    MonitorHeart,
-    SupportAgent,
-    Percent,
-    Savings,
-    Settings,
-    Menu as MenuIcon,
-    AccountCircle,
-    Notifications,
-    ThumbUp, // Ícono para 'like'
-    Announcement, // Ícono para notificaciones de lanzamiento
-    Comment, // Ícono para respuestas a comentarios
-    ChevronRight,
-    Inventory2, // Ensure you have the correct import for Inventory2
-    LocalAtm,
+import {Home,Chat,Build,School,TrendingUp,MonitorHeart,SupportAgent,Percent,Savings,
+    Settings,Menu as MenuIcon,AccountCircle,Notifications,ThumbUp,Announcement,
+    Comment, ChevronRight,Inventory2,LocalAtm,
     ShoppingCart,
 } from '@mui/icons-material';
 import Slide from '@mui/material/Slide'; // Importa Grow de Material UI
 
-
 import { colors } from '../colors';
 import logoBlanco from '../../assets/img/logos/logoBlanco.png';
 import { useNavigation } from '../../hooks/useNavigation';
-
 const drawerWidth = 240;
 
 const NavBarPrincipal = ({ children, footer }) => {
@@ -108,13 +73,13 @@ const NavBarPrincipal = ({ children, footer }) => {
         { id: 4, text: 'Hemos lanzado: Curso de Product Marketing', date: 'Hace 15 días', type: 'new', icon: <Announcement /> },
         { id: 5, text: 'Hemos lanzado: Curso de Inglés Básico A1 para Principiantes', date: 'Hace 22 días', type: 'new', icon: <Announcement /> },
     ];
-    const [checked, setChecked] = useState(true); // Estado para el control de la animación
+    const [checked] = useState(true); // Estado para el control de la animación
 
     return (
         <Box sx={{
             display: 'flex',
             flexDirection: 'column',
-            minHeight: '100vh', // Asegura que el contenedor ocupe toda la altura de la ventana
+            minHeight: '100vh', 
         }}>
             <CssBaseline />
 

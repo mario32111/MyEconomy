@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintaxis CSS3</title>
+
+    <style>
+
+        /*El selector H1 es el que sufre los cambios*/
+        h1{
+            color:rgb(255, 0, 0);
+        }
+
+        h2{
+            color: rgb(224, 191, 0);
+        }
+
+        /* Es un elemento unico que sufre este cambio*/
+        #primerparrafo{
+            color: rgb(70, 43, 226);
+        }
+
+        .estilo1{
+            color: brown;
+        }
+
+        /* propiedad HOVER cuando se pasa el mouse por ensima del texto*/
+        h1:hover{
+            color: black;
+        }
+
+        h2:hover{
+            color: black;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <!--El id indica el elemento unico -->
+    <h1>Ejemplo de selector</h1>
+
+
+    <h2>Ejemplo del NUMERAL, el elemento unico</h2>
+    <p id="primerparrafo">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+
+        <!--Class aplica a elementos multiples, es decir a todo un grupo indica el nombre del ID -->
+        <h1 class="estilo1">Elementos multiples</h1>
+        <p class="estilo1">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+        <p class="estilo1">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+        <p class="estilo1">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+
+</body>
+
+</html>

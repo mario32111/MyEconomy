@@ -1,32 +1,12 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Button,
-    TextField,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    MenuItem,
-    Select,
-    FormControl,
-    InputLabel,
-    List,
-    ListItem,
-    ListItemText,
-    Tabs,
-    Tab,
-    IconButton
-} from '@mui/material';
-
-import MicIcon from '@mui/icons-material/Mic';
-import RealTimeAudioToText from './MicModal'
+import {Box,Typography,Button,TextField,Dialog,DialogTitle,DialogContent,DialogActions,MenuItem,Select,FormControl,InputLabel,List,ListItem,ListItemText,Tabs,Tab,IconButton} from '@mui/material';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { ThemeProvider } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { theme } from '../colors';
+import MicIcon from '@mui/icons-material/Mic';
+import RealTimeAudioToText from './MicModal'
 
 const HomePage = ({ MicModalWindow }) => {
     const [openModal, setOpenModal] = useState(false);
@@ -46,9 +26,8 @@ const HomePage = ({ MicModalWindow }) => {
 
     const COLORS = ['#4B0082', '#8A2BE2', '#5D3FD3', '#4682B4', '#1E90FF', '#4169E1', '#6A5ACD', '#00BFFF'];
 
-    // Datos para la gráfica (incluyendo préstamos)
     const data = transactions.reduce((acc, item) => {
-        const existingCategory = acc.find(d => d.name === item.type === 'Préstamo' ? 'Préstamo' : item.category);
+        const existingCategory = acc.find(d => d.name === (item.type === 'Préstamo' ? 'Préstamo' : item.category));
         if (existingCategory) {
             existingCategory.value += item.amount;
         } else {
@@ -79,7 +58,6 @@ const HomePage = ({ MicModalWindow }) => {
         let updatedLoan = totalLoan;
 
         if (editingIndex !== null) {
-            // Editando transacción existente
             const prevTransaction = updatedTransactions[editingIndex];
             if (prevTransaction.type === 'Gasto') {
                 updatedSpent -= prevTransaction.amount;
@@ -88,7 +66,6 @@ const HomePage = ({ MicModalWindow }) => {
             }
             updatedTransactions[editingIndex] = { ...transactionData, amount };
         } else {
-            // Agregando nueva transacción
             updatedTransactions.push({ ...transactionData, amount });
         }
 
@@ -135,8 +112,8 @@ const HomePage = ({ MicModalWindow }) => {
                 <Typography variant="h4" color="primary" gutterBottom>Resumen de Gastos</Typography>
                 <Typography variant="h6" color="textSecondary" sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'nowrap' }}>
                     Presupuesto Diario: ${budget.toFixed(2)} |
-                    <span style={{ color: 'red' }}>Gastos: ${totalSpent.toFixed(2)}</span> |
-                    <span style={{ color: '#FF69B4' }}>Préstamos: ${totalLoan.toFixed(2)}</span> |
+                    <span style={{ color: 'red' }}>Gastado: ${totalSpent.toFixed(2)}</span> |
+                    <span style={{ color: '#FF69B4' }}>Préstado: ${totalLoan.toFixed(2)}</span> |
                     <span style={{ color: 'green' }}>Disponible: ${amountLeft.toFixed(2)}</span>
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px', position: 'relative' }}>
@@ -174,10 +151,10 @@ const HomePage = ({ MicModalWindow }) => {
                         variant="contained"
                         sx={{
                             backgroundColor: 'red',
-                            borderRadius: '50%',  // Hace que el botón sea completamente redondo
+                            borderRadius: '50%',
                             width: '40px',
                             height: '40px',
-                            minWidth: '40px' // Asegura que no se expanda
+                            minWidth: '40px'
                         }}
                         onClick={handleOpenMicModal}
                     >

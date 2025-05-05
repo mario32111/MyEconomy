@@ -1,0 +1,926 @@
+/* variables */
+
+/*selector de nombre root para color primario de la pagina*/
+:root{
+    --color-primario: #fcb03b;
+    --color-secundario: #e92f3d;
+    --color-background-sombra: #E92F3D30;
+    --color-background: #eff6f5;
+    --color-texto: #a1a5a6;
+    --text-default: 'Open Sans', sans-serif; /* font family */
+}
+
+/*Estilos generales*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--text-default);
+
+
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+body{
+    background: var(--color-background);
+}
+
+/* declaracion de clases es con . puntos */
+.titulos{
+    font-size: 40px;
+    text-align: center;
+    text-transform: uppercase; /* mayuscula*/
+    letter-spacing: 1px; /* separar las letras 1 pixel */
+    font-weight: 600; /* para que se vea en negritas */
+
+} 
+
+.subtitulos{
+    font-size: 25px;
+    font-weight: 400;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-primario);
+}
+
+.btn{
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #FFF;
+    background: var(--color-primario);
+    font-weight: 700;
+    padding: 15px;
+    outline: none;
+    border: 2px solid var(--color-primario);
+    cursor: pointer;
+    position: relative;
+    top: 20px;
+    transition: all 0.3s; /* config para las animaciones del boton*/
+}
+
+.btn span{
+    padding-left: 10px;
+}
+
+.btn:hover{
+    padding: 15px 45px;
+
+}
+
+/* MENU PRINCIPAL */
+.menu-principal{
+    width: 100%; /* los segmentos ocupan el lado completo de la pagina web*/
+    display: flex; /* para que los segmentos aparezcan unos del lado del otro */
+    justify-content: space-between;
+    align-items: center;
+    height: 75px;
+    padding: 0 30px;
+    margin-top: 30px;
+    background: var(--color-background);
+    z-index: 1; /* con Z index se manejan capas. En este caso, este elemento estará UNA 1 capa más adelante y todos los elementos estaran una capa atras en el eje Z*/
+
+}
+
+.logo img{
+    width: 130px;
+    cursor: pointer;
+}
+
+.menu-bar{
+    display: flex; /* iconos aparecen unos al lado de otro*/
+    width: 100%;
+    justify-content: space-between;
+}
+
+.menu-bar .enlaces ul li{
+    display: inline-block;
+    padding: 0 10px;
+}
+
+.menu-bar .enlaces ul li a{
+    font-size: 14px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-texto);
+    font-weight: 600;
+
+    background: linear-gradient(currentColor, currentColor); /* currentColor es el color por defecto que yo defini, es una propiedad */
+    background-position: 100% 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    transition: all 0.5s;
+}
+
+.menu-bar .enlaces ul li a:hover{  /* animacion de los hover en las etiquetas */
+    color: var(--color-secundario); /* color de la linea en eje x*/
+    background-size: 50% 2px; /* porcentaje de la linea cuando pase el mouse por encima*/
+}
+
+/* ACTIVIDAD DE LOS ALUMNOS: Ahora se acomodan los iconos de las redes sociales */
+/* Solucion */
+.menu-bar .sociales a{
+    font-size: 16px;
+    text-transform: uppercase;
+    padding: 0 10px;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--color-texto);
+    transition:  all 0.5s;
+}
+
+.menu-bar .sociales a:hover{
+    color: var(--color-secundario);
+}
+
+/* Barra de menu principal PARA DISPOSITIVOS MOVILES */
+.menu-principal i{
+    cursor: pointer;
+    color: var(--color-texto);
+    font-size: 30px;
+    float: right; /* la barra de menu siempre aparecera a la derecha */
+    display: none;
+    transition: all 0.5s;
+
+}
+
+.menu-principal i:hover{
+    color: var(--color-secundario);
+}
+
+
+/* SLIDER DE PRODUCTOS despues de haber construido el HTML*/
+#menu-productos .contenedor-principal{
+    display: flex;
+    align-items: center;
+    position: relative; /* position relativa es detectar la posicion en la que estoy, 
+    por lo tanto los elementos que esten dentro de ese contenedor si agrego un position absolute
+    este me respeta el tamaño de un contenedor y despues lo puedo manejar como quiera */
+    z-index: 0;
+}
+
+
+.contenedor-principal #btn-izquierda,
+.contenedor-principal #btn-derecha{
+    position: absolute;
+    height: 10%;
+    width: 50px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 40px;
+    margin: 0 15px;
+    color: var(--color-secundario);
+    z-index: 500; /* para ubicarlo adelante de todos mis contenidos */
+    outline: none;
+    transition: all 0.3s;
+}
+
+.contenedor-principal #btn-izquierda:hover,
+.contenedor-principal #btn-derecha:hover{
+    background: var(--color-background-sombra);
+    transform: translateY(5px); /* cuando pase el cursor baja 5 pixeles*/
+}
+
+
+.contenedor-principal #btn-izquierda{
+    left: 0; /* se ubica a la izquierda en 0 que es totalmente */
+}
+
+.contenedor-principal #btn-derecha{
+    right: 0; /* se ubica a la derecha en 0 que es totalmente */
+}
+
+.slider{
+    display: flex; /* los elementos aparecen uno del lado de otro*/
+    overflow: hidden; /* se oculta el slider */
+    height: calc(100vh - 80px); /* para que abarque el tamaño completo de la pagina 
+    menos lo que ocupa de espacio el menu */
+    scroll-behavior: smooth; /* ANIMACION: se agrega despues de configurar JAVA script de SLIDER*/
+}
+
+.container-productos{
+    display: flex; /* los elementos de texto aparecen uno del lado del otro*/
+    justify-content: center;
+    align-items: center;
+    flex-basis: 100%;
+    flex-shrink: 0;
+}
+
+.descripcion-productos{
+    width: 30%;
+}
+
+.descripcion-productos h1{
+    font-size: 5vw; /* el objeto cambia de tamaño con la pantalla*/
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.descripcion-productos h2{
+    text-transform: lowercase;
+    font-size: 2.2vw;
+    font-weight: 100;
+
+}
+
+.descripcion-productos p{
+    color: var(--color-texto);
+    font-style: italic;
+    text-align: justify;
+}
+
+.imagen-productos{
+    width: 50%;
+    display: flex;
+    justify-content: center;
+
+}
+
+.imagen-productos img{
+    width: 100%;
+    transform: scale(1.1);
+    transition: all 0.3s;
+}
+
+
+.container-productos:hover .imagen-productos img{
+    transform: scale(1.15);
+}
+
+
+/* SECCION SERVICIOS */
+#servicios{
+    height: 100vh;
+    background: #FFF;
+    padding: 40px;
+
+}
+
+.servicios-titulos{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* creacion de grillas*/
+.servicios-container{
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(3,1fr); /* ordenar grillas, 3 filas*/
+    grid-template-rows: repeat(2, auto); /* ordenar renglones, 2 lineas*/
+    grid-gap: 30px;
+    grid-template-areas:    "ingredientes  imagen  rapidez"
+                            "calidad       imagen  delivery";
+}
+
+.calidad{
+    grid-row: calidad;
+    grid-column: calidad;
+    transition: all 0.5s;
+}
+
+.calidad:hover{
+    transform: scale(1.1);
+}
+
+
+.ingredientes{
+    grid-row: ingredientes;
+    grid-column: ingredientes;
+    transition: all 0.5s;
+}
+
+.ingredientes:hover{
+    transform: scale(1.1);
+}
+
+
+.rapidez{
+    grid-row: rapidez;
+    grid-column: rapidez;
+    transition: all 0.5s;
+}
+
+.rapidez:hover{
+    transform: scale(1.1);
+}
+
+
+.delivery{
+    grid-row: delivery;
+    grid-column: delivery;
+    transition: all 0.5s;
+}
+
+.delivery:hover{
+    transform: scale(1.1);
+}
+
+.imagen-central{
+    grid-row: imagen;
+    grid-column: imagen;
+    transition: all 0.5s;
+}
+
+.imagen-central:hover{
+    transform: scale(1.1);
+}
+
+.items{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.items span{
+    width: 95px;
+    font-size: 40px;
+    color: var(--color-secundario);
+    padding: 20px;
+    border: 5px double #dedede;
+    border-radius: 50%;
+    transition: all 0.5s;
+}
+
+.items span:hover{
+    background: var(--color-secundario);
+    color: #FFF;
+}
+
+.ingredientes span,
+.calidad span{
+    color: var(--color-primario);
+}
+
+.ingredientes span:hover,
+.calidad span:hover{
+    background: var(--color-primario);
+    color: #FFF;
+}
+
+.items .titulo-item{
+    text-transform: uppercase;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.items .texto-item{
+    font-size: 14px;
+    color: var(--color-texto);
+    text-align: center;
+    font-style: italic;
+    padding: 0 20px;
+}
+
+/* SIGUIENTE PARTE: SECCION DE EQUIPO*/
+#equipo{
+    height: 100vh;
+    display: flex;
+}
+
+.persona{
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.5s;
+
+}
+
+.persona:hover{
+    flex-grow: 3;
+}
+
+.persona-imagen{
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: grayscale(80%); /* filtros para la imagen escala de grises*/
+}
+
+.persona:hover .persona-imagen{
+    filter:grayscale(0%)
+}
+
+/* *Datos de las imagenes */
+.persona-info{
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+    transition: all 0.5s;
+}
+
+.persona-info h2{
+    font-size: 30px;
+    color: #000;
+    font-weight: 600;
+    text-shadow: 2px 2px 3px rgba(0,0,0.5); /* el numero 5 representa el nivel de transparencia*/
+}
+
+.persona-info p{
+    color: var(--color-secundario);
+    font-size: 20px;
+    font-weight: 700;
+    font-style: italic;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 3px rgb(243, 8, 8) /* el numero 5 representa el nivel de transparencia*/
+}
+
+.social-media a{
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    color: #FFF;
+    background: var(--color-secundario);
+    line-height: 40px;
+    border-radius: 50%; /* para que los iconos se vean circulares */
+    margin: 0 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.5s;
+}
+
+.social-media a:hover{
+    color: var(--color-secundario);
+    background: transparent;
+    transform: scale(2);
+}
+
+.persona:hover .persona-info{
+    opacity: 1;
+    bottom: 60px;
+    transition-delay: 0.3s;
+}
+
+
+/** SIGUIENTE PARTE DEL CURSO: SECCION DE INGREDIENTES */
+#ingredientes{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ingre{
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    height: 250px;
+
+}
+
+.imagen-ingre{
+    position: absolute;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.info-ingre{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    transition: all 0.3s;
+}
+
+.info-ingre p{
+    font-size: 28px;
+    color: #FFF;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.info-ingre:hover{
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.info-ingre:hover p{
+    transform: translateY(10px);
+
+}  /* DESPUES DE ESTO PASA A LOS QUERYS EN 650PIXELES Y AGREGA EL CODIGO DEBAJO DE SLIDER*/
+
+
+
+/* SECCION DE FORMULARIO CONTACTO */
+#contacto{
+    height: 100vh;
+    padding: 60px;
+    position: relative;
+
+}
+
+#formulario{
+    width: 70%;
+    margin: 50px auto;
+}
+
+.two-fiels{
+    display: flex;
+    justify-content: space-between; /* space between aparecen uno al lado de otro*/
+}
+
+.input-text, .input-email, .textarea{
+    border: 1px solid #b4b4b4;
+    color: #888;
+    background: #FFF;
+    outline: none;
+    padding: 15px 60px;
+    height: 45px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: all 0.5s;
+
+}
+
+.textarea{
+    width: 100%;
+    height: 150px;
+    resize: none;
+}
+
+.input-text, .input-email{
+    width: 100%;
+
+}
+
+.inputConIcon{
+    position: relative;
+    width: 48%;
+}
+
+.inputConIcon i{
+    position:absolute;
+    left: 0;
+    padding: 14px 15px;
+    background: #888;
+    color: #FFF;
+    transition: all 0.5s;
+}
+
+.textareaicon{
+    width: 100%;
+}
+
+.textareaicon i{
+    background: transparent;
+    color: #888;
+    padding: 0;
+    font-size: 25px;
+    left: 17px;
+    top:13px;
+    transition: all 0.5s;
+}
+
+
+.inputConIcon input:focus,
+.inputConIcon textarea:focus{
+    border: 1px solid var(--color-primario);
+}
+
+.inputConIcon input:focus + i{
+    background: var(--color-primario);
+}
+
+.inputConIcon textarea:focus + i{
+    color: var(--color-primario);
+}
+
+.fiels-btn{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-input{
+    padding: 15px 50px;
+}
+
+.btn-input:hover{
+    padding: 15px 65px;
+}
+
+
+
+/* ESTILOS DE LAS ALERTAS*/
+.alertas{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alert{
+    width: 60%;
+    padding: 20px 60px;
+    position: fixed;
+    top: 0;
+    transition: all 0.5s;
+}
+
+.alert.show{
+    transform: translateY(50%);
+}
+
+.alert.hide{
+    transform: translateY(-100%);
+}
+
+.alert .icono-alert{
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+}
+
+.alert .msg{
+    padding: 0 20px;
+    font-size: 18px;
+}
+
+/* ALERTA DE ERROR*/
+#alertError{
+    background: #f8d7da;
+    border-right: 4px solid #da3748;
+}
+
+#alertError .icono-alert{
+    color: #da3748;
+}
+
+#alertError .msg{
+    color: #721c24;
+}
+
+/* ALERTA DE success*/
+#alertSuccess{
+    background: #d4edda;
+    border-right: 4px solid #279e43;
+}
+
+#alertSuccess .icono-alert{
+    color: #279e43;
+}
+
+#alertSuccess .msg{
+    color: #155724;
+}
+
+
+/* FINAL: PIE DE PAGINA OH YEA*/
+footer{
+    display: flex; /* elementos uno al lado del otro*/
+    margin-top: -100px;
+
+}
+
+.sociales-metodo{
+    width: 25%;
+    height: 100px;
+    background: #333;
+    color: #fff;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+}
+
+.sociales-metodo i{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 30px;
+    line-height: 100px;
+    transition: all 0.5s;
+}
+
+.sociales-metodo span{
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    padding: 10px 0;
+    font-size: 12px;
+    background: var(--color-primario);
+    color: #fff;
+    letter-spacing: 1px;
+    font-weight: 700;
+    transform: translateY(60px);
+    transition: all 0.5s;
+
+}
+
+.sociales-metodo i:hover + span{ /* cuando yo entre a los iconos le aplica el estilo hover al span */
+    transform: translateY(0px);
+}
+
+.sociales-metodo i:hover{
+    transform: translateY(-20px);
+}
+
+
+/* EXTRA: BOTON DE IR ARRIBA */
+#btn-top{
+    width: 50px;
+    height: 50px;
+    background: var(--color-primario);
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1;
+    transform: translateY(200%);
+    transition: all 0.5s;
+}
+
+#btn-top.show{
+    transform: translateY(0);
+}
+
+#btn-top.scrollFinal{
+    transform: translateY(-250%);
+}
+
+#btn-top span{
+    color: #fff;
+    font-size: 25px;
+    width: 100%;
+    text-align: center;
+    line-height: 50px;
+    transition: all 0.5s;
+}
+
+#btn-top:hover{
+    background: #d89127;
+}
+
+#btn-top:hover span{
+    transform: translateY(-3px);
+}
+
+
+/** MEDIA QUERYS SIEMPRE SE DEJAN AL FINAL PARA QUE TODO SEA RESPONSIVE */
+
+/* SE HACE DESPUES DEL MENU PRINCIPAL */
+/* slider de productos*/
+@media screen and (max-width: 850px){
+    /* SLIDER PRODUCTOS */
+    .container-productos{
+         flex-direction: column;
+    }
+
+    .descripcion-productos{
+         width: 70%;
+         order: 1;
+    }
+
+    .descripcion-productos .btn{
+         padding: 10px 20px;
+    }
+
+    .descripcion-productos .btn:hover{
+         padding: 10px 30px;
+    }
+
+    /* OTRAP PARTE DEL CURSO: SECCION SERVICIOS RESPONSIVE*/
+    .servicios-container{
+        margin-top: 50px;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas: "ingredientes      rapidez "
+                             "calidad           delivery";
+
+    }
+
+    .imagen-central{
+        display:none; /* para quitar objetos en este caso imagen*/
+    }
+    
+}
+
+/* SE HACE ANTES QUE EL SLIDER:*/
+/* MENU PRINCIPAL */
+@media screen and (max-width: 650px){
+    .menu-principal{
+        position: fixed;
+        top: 0;
+        margin-top: 0;
+    }
+
+    .menu-principal i{
+        display: block;
+    }
+
+    .menu-bar{
+        justify-content: space-around;
+        align-items: center;
+        flex-direction: column;
+        width: 100%;
+        height: 100vh;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 1000; /* que el elemento este siempre por delante de otros*/
+        background: #333;
+        transition: all 1s;
+        transform: translateX(100%);
+    }
+
+    .menu-bar.active{
+        transform: translateX(0%);
+
+    }
+
+
+
+    .menu-bar i{
+        position: absolute;
+        right: 50px;
+        top: 50px;
+    }
+
+    .menu-bar .enlaces ul li{
+        display: block;
+        padding: 20px 10px;
+        text-align: center;
+    }
+
+    .menu-bar .enlaces ul li a,
+    .menu-bar .sociales a{
+        font-size: 20px;
+    }
+
+    /* ESTO SE AGREGA DESPUES DE CONFIGURAR SLIDER DE IMAGENES slider productos */
+    .slider{
+        height: calc(100vh - 0px);
+    }
+
+    .imagen-productos{
+        width: 65%;
+    }
+
+    .descripcion-productos h1{
+        font-size: 7vw;
+    }
+
+    .descripcion-productos h2{
+        font-size: 3vw;
+    }
+
+    /* AGREGAR DESPUES DE CONFIGURAR LAS IMAGENES DE INGREDIENTES*/
+    .info-ingre .txt-ingre{
+        display: none;
+    }
+
+    /* AGREGAR DESPUES DE CONFIGURAR EL AREA DE SERVICIOS CONTACTOS MENSAJE*/
+    #formulario{
+        width: 100%;
+    }
+
+    .two-fiels{
+        flex-direction: column;
+    }
+
+    .inputConIcon{
+        width: 100%;
+    }
+
+    /* AGREGAR DESPUES DE LAS ALERTAS */
+    .alert{
+        width: 100%;
+
+    }
+
+    .alert.show{
+        transform: translateY(150%);
+
+    }
+
+    /* FOOTER */
+    footer{
+        flex-wrap: wrap;
+    }
+
+    .sociales-metodo{
+        width: 50%;
+    }
+
+    /** BOTON DE IR ARRIBA*/
+    #btn-top{
+        display: none;
+    }
+
+}
