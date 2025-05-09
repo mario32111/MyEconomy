@@ -1,12 +1,9 @@
+// src/features/Landing/pages/HomePage.jsx
 import React from 'react';
-import LandingPage from '../components/LandingPage'; // Nota: sin llaves {} si es export default
+import LandingPage from '../components/LandingPage';
 
 const HomePage = () => {
-  return (
-    <>
-      <LandingPage />
-    </>
-  );
+  return <LandingPage />;
 };
 
 export default HomePage;

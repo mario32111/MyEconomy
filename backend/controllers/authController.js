@@ -22,9 +22,14 @@ const generateToken = (user) => {
 exports.register = async (req, res, next) => {
   try {
     const {
-      name,
+      firstName,
+      middleName,
+      paternalLastName,
+      maternalLastName,
       email,
       password,
+      confirmPassword,
+      // Campos opcionales
       monthlyIncome,
       currentSavings,
       monthlyExpenses,
@@ -36,23 +41,39 @@ exports.register = async (req, res, next) => {
       notificationPreference
     } = req.body;
 
+    console.log('Datos recibidos para registro:', req.body);
+
+    // Validar que las contraseñas coincidan
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Las contraseñas no coinciden.' }
+      });
+    }
+
     // --- 1. Verificar si el usuario ya existe en PostgreSQL ---
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: { message: 'El email ya está registrado en la base de datos local.' }
+        error: { message: 'El email ya está registrado en la base de datos.' }
       });
     }
 
-    // (Manteniendo emailVerified: true como lo tienes ahora)
+    // Crear nombre completo para compatibilidad
+    const fullName = `${firstName} ${middleName ? middleName + ' ' : ''}${paternalLastName} ${maternalLastName || ''}`.trim();
+
+    // Crear usuario en la base de datos local
     const user = await User.create({
-      name,
+      firstName,
+      middleName: middleName || null,
+      paternalLastName,
+      maternalLastName: maternalLastName || null,
       email,
       password,
-      emailVerified: true,
+      emailVerified: true, // Asumimos que no requieres verificación por email
       isActive: true,
-      // Datos financieros y preferencias
+      // Datos financieros y preferencias (opcionales)
       monthlyIncome: monthlyIncome || 0,
       currentSavings: currentSavings || 0,
       monthlyExpenses: monthlyExpenses || 0,
@@ -64,57 +85,63 @@ exports.register = async (req, res, next) => {
       notificationPreference: notificationPreference || ''
     });
 
-    //registrar usuario en Supabase
-    let supabaseAuthUser = null;
+    // Registrar usuario en Supabase
+    let supabaseUserId = null;
     if (supabase) {
       console.log(`Intentando registrar ${email} en Supabase Auth...`);
       const { data: supabaseData, error: supabaseError } = await supabase.auth.signUp({
         email: email,
-        password: password, // Supabase Auth también hashea la contraseña
+        password: password,
         options: {
           data: {
-            name: name,
+            firstName,
+            middleName,
+            paternalLastName,
+            maternalLastName,
+            fullName
           }
         }
       });
 
       if (supabaseError) {
         console.error('Error al registrar en Supabase Auth:', supabaseError.message);
-        return res.status(500).json({
-          success: false,
-          error: { message: `Usuario creado en DB local, pero falló el registro en Supabase: ${supabaseError.message}` }
-        });
+        // Continuamos a pesar del error en Supabase, pero lo registramos
       } else if (supabaseData.user) {
         console.log(`Usuario ${email} registrado exitosamente en Supabase Auth con ID: ${supabaseData.user.id}`);
-        supabaseAuthUser = supabaseData.user;
-      } else {
-         console.warn(`Registro en Supabase para ${email} no devolvió un usuario, pero tampoco un error. Revisa la configuración de verificación de email en Supabase.`);
+        supabaseUserId = supabaseData.user.id;
+        
+        // Actualizar el ID de Supabase en nuestro modelo
+        user.supabaseUserId = supabaseUserId;
+        await user.save();
       }
     } else {
       console.warn('Cliente Supabase no disponible. Saltando registro en Supabase Auth.');
     }
 
-    //Generar JWT para tu aplicación
+    // Generar JWT para tu aplicación
     const token = generateToken(user);
     if (!token) {
-       return res.status(500).json({
-          success: false,
-          error: { message: 'Error interno al generar el token de sesión.' }
-        });
+      return res.status(500).json({
+        success: false,
+        error: { message: 'Error interno al generar el token de sesión.' }
+      });
     }
 
-    //Enviar Respuesta Exitosa 
+    // Enviar Respuesta Exitosa 
     res.status(201).json({
       success: true,
       data: {
-        user: { // Datos del usuario
+        user: {
           id: user.id,
-          name: user.name,
+          firstName: user.firstName,
+          middleName: user.middleName,
+          paternalLastName: user.paternalLastName,
+          maternalLastName: user.maternalLastName,
           email: user.email,
           emailVerified: user.emailVerified
         },
-        token, // El token JWT
-        supabaseUserId: supabaseAuthUser ? supabaseAuthUser.id : null
+        token,
+        supabaseUserId
       }
     });
 
@@ -122,7 +149,10 @@ exports.register = async (req, res, next) => {
     // Captura error inesperado
     console.error('Error detallado en registro (catch general):', error);
     if (!res.headersSent) {
-      next(error);
+      res.status(500).json({
+        success: false,
+        error: { message: error.message || 'Error interno del servidor' }
+      });
     }
   }
 };
@@ -156,7 +186,7 @@ exports.login = async (req, res, next) => {
     if (!isValidPassword) {
       // Incrementar intentos fallidos
       if (user.incrementLoginAttempts) {
-         await user.incrementLoginAttempts();
+        await user.incrementLoginAttempts();
       }
       return res.status(401).json({
         success: false,
@@ -176,17 +206,17 @@ exports.login = async (req, res, next) => {
     }
 
     // Resetear intentos de login si la contraseña fue correcta
-     if (user.resetLoginAttempts) {
-        await user.resetLoginAttempts();
-     }
+    if (user.resetLoginAttempts) {
+      await user.resetLoginAttempts();
+    }
 
     // Generar token JWT para tu aplicación
     const token = generateToken(user);
-     if (!token) {
-       return res.status(500).json({
-          success: false,
-          error: { message: 'Error interno al generar el token de sesión.' }
-        });
+    if (!token) {
+      return res.status(500).json({
+        success: false,
+        error: { message: 'Error interno al generar el token de sesión.' }
+      });
     }
 
     // Enviar respuesta exitosa
@@ -195,7 +225,8 @@ exports.login = async (req, res, next) => {
       data: {
         user: { // Devuelve solo la información necesaria del usuario
           id: user.id,
-          name: user.name,
+          firstName: user.firstName,
+          paternalLastName: user.paternalLastName,
           email: user.email,
           emailVerified: user.emailVerified
         },
@@ -208,11 +239,12 @@ exports.login = async (req, res, next) => {
   }
 };
 
+// Resto de funciones sin cambios...
 exports.verifyEmail = async (req, res, next) => {
   try {
     const { token: verificationToken } = req.params; 
     if (!verificationToken) {
-        return res.status(400).json({ success: false, error: { message: 'Token de verificación no proporcionado.' } });
+      return res.status(400).json({ success: false, error: { message: 'Token de verificación no proporcionado.' } });
     }
 
     // Busca al usuario por el token y verifica que no haya expirado
@@ -248,4 +280,56 @@ exports.verifyEmail = async (req, res, next) => {
   }
 };
 
-// --- Podrías añadir aquí otras funciones: forgotPassword, resetPassword, etc. ---
+exports.verifyEmailForce = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: { message: 'Email no proporcionado' } 
+      });
+    }
+    
+    // Buscar usuario por email
+    const user = await User.findOne({ where: { email } });
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        error: { message: 'Usuario no encontrado' } 
+      });
+    }
+    
+    // Marcar email como verificado
+    user.emailVerified = true;
+    user.isActive = true;
+    await user.save();
+    
+    // También actualizar en Supabase si está disponible
+    if (supabase) {
+      try {
+        // Buscar usuario en Supabase
+        const { data: supabaseUser, error: findError } = await supabase.auth.admin.getUserByEmail(email);
+        
+        if (!findError && supabaseUser) {
+          // Actualizar metadatos para marcar como verificado
+          await supabase.auth.admin.updateUserById(supabaseUser.id, {
+            email_confirm: true,
+            user_metadata: { ...supabaseUser.user_metadata, emailVerified: true }
+          });
+        }
+      } catch (supabaseError) {
+        console.error('Error al actualizar usuario en Supabase:', supabaseError);
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: 'Email verificado correctamente'
+    });
+  } catch (error) {
+    console.error('Error al verificar email forzadamente:', error);
+    next(error);
+  }
+};

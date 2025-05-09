@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Link, Alert, CircularProgress } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { useAuth } from '../../../../shared/contexts/AuthContext';
+// Cambiar la importación para usar la implementación de Supabase
+import { useAuth } from '../../../../shared/hooks/useAuth';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -28,10 +29,16 @@ const LoginForm = () => {
     try {
       setError('');
       setLoading(true);
-      const { error } = await login(formData.email, formData.password);
-      if (error) throw error;
+      
+      console.log('Intentando iniciar sesión con:', formData.email);
+      
+      // La función login de useAuth.js devuelve { data, error }
+      const result = await login(formData.email, formData.password);
+      console.log('Resultado de login:', result);
+      
       navigate('/dashboard');
     } catch (error) {
+      console.error('Error completo:', error);
       setError(error.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);

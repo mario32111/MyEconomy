@@ -1,38 +1,41 @@
 import { createTheme } from '@mui/material/styles';
+import colors from './colors';
+import typography from './typography';
+import spacing from './spacing';
 
-export const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#2196F3',
-      light: '#64B5F6',
-      dark: '#1976D2'
-    },
-    secondary: {
-      main: '#FF4081',
-      light: '#FF80AB',
-      dark: '#F50057'
-    }
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700
-    },
-    h2: {
-      fontWeight: 600
-    },
-    h3: {
-      fontWeight: 600
-    }
+const theme = createTheme({
+  palette: colors,
+  typography: typography,
+  spacing: spacing.base,
+  shape: {
+    borderRadius: 8
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
+          textTransform: 'none',
           borderRadius: 8,
-          textTransform: 'none'
+          padding: `${spacing(1)} ${spacing(2)}`
+        }
+      }
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }
+      }
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: colors.background.paper,
+          color: colors.text.primary
         }
       }
     }
   }
 });
+export default theme;

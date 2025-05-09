@@ -1,79 +1,112 @@
-import React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import LinearProgress from '@mui/material/LinearProgress';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import HomeIcon from '@mui/icons-material/Home';
-import FlightIcon from '@mui/icons-material/Flight';
-import LaptopIcon from '@mui/icons-material/Laptop';
+import React, { useState, useEffect } from 'react';
+import { 
+  Card, 
+  CardContent, 
+  Typography, 
+  Box, 
+  LinearProgress, 
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Divider
+} from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 
-const goals = [
-  {
-    name: 'Carro nuevo',
-    current: 45000,
-    target: 250000,
-    progress: 18,
-    icon: <DirectionsCarIcon />
-  },
-  {
-    name: 'Enganche casa',
-    current: 150000,
-    target: 500000,
-    progress: 30,
-    icon: <HomeIcon />
-  },
-  {
-    name: 'Vacaciones',
-    current: 15000,
-    target: 30000,
-    progress: 50,
-    icon: <FlightIcon />
-  },
-  {
-    name: 'Laptop nueva',
-    current: 12000,
-    target: 25000,
-    progress: 48,
-    icon: <LaptopIcon />
-  }
+// Datos de ejemplo para metas
+const mockGoals = [
+  { id: 1, name: 'Fondo de emergencia', target: 50000, current: 25000, color: '#4CAF50' },
+  { id: 2, name: 'Vacaciones', target: 20000, current: 5000, color: '#2196F3' },
+  { id: 3, name: 'Nuevo auto', target: 200000, current: 40000, color: '#9C27B0' }
 ];
 
-const GoalsWidget = () => {
+const GoalsWidget = ({ userId }) => {
+  const [goals, setGoals] = useState([]);
+  
+  useEffect(() => {
+    // Aquí se cargarían las metas reales del usuario
+    // Por ahora usamos datos de ejemplo
+    setGoals(mockGoals);
+  }, [userId]);
+  
+  // Formatear números como moneda
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+  
   return (
-    <Card>
+    <Card elevation={3} sx={{ height: '100%' }}>
       <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Metas Financieras
-        </Typography>
-        <List>
-          {goals.map((goal, index) => (
-            <ListItem key={index}>
-              <ListItemIcon>
-                {goal.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={goal.name}
-                secondary={
-                  <>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={goal.progress} 
-                      sx={{ my: 1 }}
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6">
+            Metas Financieras
+          </Typography>
+          <Button 
+            size="small" 
+            startIcon={<AddIcon />}
+            variant="outlined"
+          >
+            Nueva Meta
+          </Button>
+        </Box>
+        
+        {goals.length === 0 ? (
+          <Box sx={{ py: 4, textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              No hay metas configuradas
+            </Typography>
+          </Box>
+        ) : (
+          <List sx={{ width: '100%' }}>
+            {goals.map((goal, index) => {
+              const progress = Math.min(Math.round((goal.current / goal.target) * 100), 100);
+              
+              return (
+                <React.Fragment key={goal.id}>
+                  {index > 0 && <Divider sx={{ my: 1 }} />}
+                  <ListItem sx={{ px: 0, py: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="subtitle2">{goal.name}</Typography>
+                          <Typography variant="subtitle2">{progress}%</Typography>
+                        </Box>
+                      }
+                      secondary={
+                        <Box sx={{ width: '100%', mt: 1 }}>
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={progress} 
+                            sx={{ 
+                              height: 8, 
+                              borderRadius: 4,
+                              bgcolor: 'grey.200',
+                              '& .MuiLinearProgress-bar': {
+                                bgcolor: goal.color
+                              }
+                            }} 
+                          />
+                          <Box display="flex" justifyContent="space-between" mt={0.5}>
+                            <Typography variant="caption" color="text.secondary">
+                              {formatCurrency(goal.current)}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {formatCurrency(goal.target)}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      }
                     />
-                    <Typography variant="caption" component="div">
-                      ${goal.current.toLocaleString()} / ${goal.target.toLocaleString()}
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
-          ))}
-        </List>
+                  </ListItem>
+                </React.Fragment>
+              );
+            })}
+          </List>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,3 +1,4 @@
+// backend/models/User.js
 const { Model, DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
 
@@ -9,9 +10,35 @@ class User extends Model {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true
       },
-      name: {
+      // Datos básicos
+      firstName: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+          notEmpty: true
+        }
+      },
+      middleName: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      paternalLastName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true
+        }
+      },
+      maternalLastName: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      // Campo name para compatibilidad con código existente
+      name: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return `${this.firstName} ${this.paternalLastName}`;
+        }
       },
       email: {
         type: DataTypes.STRING,
@@ -25,48 +52,51 @@ class User extends Model {
         type: DataTypes.STRING,
         allowNull: false
       },
-      isActive: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
-      },
+      
+      // Campos de estado
       emailVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
       },
-      emailVerificationToken: {
-        type: DataTypes.STRING,
-        allowNull: true
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
       },
-      emailVerificationExpires: {
-        type: DataTypes.DATE,
-        allowNull: true
-      },
-      // Campos para control de intentos de login
+      
+      // Campos para verificación de email
+      emailVerificationToken: DataTypes.STRING,
+      emailVerificationExpires: DataTypes.DATE,
+      
+      // Campos para seguridad
       loginAttempts: {
         type: DataTypes.INTEGER,
         defaultValue: 0
       },
-      lockUntil: {
-        type: DataTypes.DATE,
+      lockUntil: DataTypes.DATE,
+      
+      // Campos para recuperación de contraseña
+      resetPasswordToken: DataTypes.STRING,
+      resetPasswordExpires: DataTypes.DATE,
+      
+      // Campos para integración con Supabase
+      supabaseUserId: {
+        type: DataTypes.STRING,
         allowNull: true
       },
-      // Campos del perfil financiero
+      
+      // Campos financieros
       monthlyIncome: {
         type: DataTypes.DECIMAL(10, 2),
-        defaultValue: 0,
-        allowNull: true
+        defaultValue: 0
       },
       currentSavings: {
         type: DataTypes.DECIMAL(10, 2),
-        defaultValue: 0,
-        allowNull: true
+        defaultValue: 0
       },
       monthlyExpenses: {
         type: DataTypes.DECIMAL(10, 2),
-        defaultValue: 0,
-        allowNull: true
+        defaultValue: 0
       },
-      // Campos de objetivos
       primaryGoal: {
         type: DataTypes.STRING,
         allowNull: true
@@ -77,10 +107,8 @@ class User extends Model {
       },
       savingsGoal: {
         type: DataTypes.DECIMAL(10, 2),
-        defaultValue: 0,
-        allowNull: true
+        defaultValue: 0
       },
-      // Campos de preferencias
       riskTolerance: {
         type: DataTypes.STRING,
         allowNull: true
@@ -97,38 +125,66 @@ class User extends Model {
       sequelize,
       modelName: 'User',
       tableName: 'users',
+      timestamps: true,
       hooks: {
         beforeCreate: async (user) => {
-          const salt = await bcrypt.genSalt(10);
-          user.password = await bcrypt.hash(user.password, salt);
+          if (user.password) {
+            user.password = await bcrypt.hash(user.password, 10);
+          }
+        },
+        beforeUpdate: async (user) => {
+          if (user.changed('password')) {
+            user.password = await bcrypt.hash(user.password, 10);
+          }
         }
       }
     });
   }
 
-  async validatePassword(password) {
-    return await bcrypt.compare(password, this.password);
-  }
-
-  isLocked() {
-    return this.lockUntil && new Date(this.lockUntil) > new Date();
-  }
-
-  async incrementLoginAttempts() {
-    this.loginAttempts = (this.loginAttempts || 0) + 1;
-    
-    // Si excede el máximo de intentos, bloquear la cuenta
-    if (this.loginAttempts >= 5) {
-      this.lockUntil = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
+  static associate(models) {
+    // Definir relaciones con otros modelos
+    if (models.Account) {
+      this.hasMany(models.Account, { foreignKey: 'userId', as: 'accounts' });
     }
-    
+  }
+
+  // Método para validar contraseña
+  async validatePassword(password) {
+    return bcrypt.compare(password, this.password);
+  }
+
+  // Método para verificar si la cuenta está bloqueada
+  isLocked() {
+    return this.lockUntil && this.lockUntil > Date.now();
+  }
+
+  // Método para incrementar intentos de login
+  async incrementLoginAttempts() {
+    // Implementar lógica de bloqueo después de ciertos intentos
+    const MAX_LOGIN_ATTEMPTS = 5;
+    const LOCK_TIME = 2 * 60 * 60 * 1000; // 2 horas en milisegundos
+
+    // Si ya está bloqueado, no hacer nada
+    if (this.isLocked()) return;
+
+    // Incrementar intentos
+    this.loginAttempts += 1;
+
+    // Verificar si debe ser bloqueado
+    if (this.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+      this.lockUntil = new Date(Date.now() + LOCK_TIME);
+    }
+
     await this.save();
   }
 
+  // Método para resetear intentos de login
   async resetLoginAttempts() {
-    this.loginAttempts = 0;
-    this.lockUntil = null;
-    await this.save();
+    if (this.loginAttempts > 0 || this.lockUntil) {
+      this.loginAttempts = 0;
+      this.lockUntil = null;
+      await this.save();
+    }
   }
 }
 

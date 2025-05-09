@@ -3,10 +3,8 @@ import {
   Box,
   Container,
   Typography,
-  Card,
   CardContent,
   CardHeader,
-  Button,
   List,
   ListItem,
   ListItemIcon,
@@ -17,7 +15,10 @@ import {
 import { Check, Close } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../../core/constants/routes';
+import ROUTES from '../../../shared/routes/routes';
+// Importar nuestros componentes personalizados
+import { Button } from '../../../shared/components/UI/Button';
+import { Card } from '../../../shared/components/UI/Card';
 
 const plans = [
   {
@@ -78,16 +79,14 @@ const PricingCard = ({ plan, delay }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
     >
+      {/* Usar nuestro Card personalizado */}
       <Card
+        interactive
+        rounded={plan.recommended}
+        elevation={plan.recommended ? 4 : 2}
         sx={{
           height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
           position: 'relative',
-          transition: 'transform 0.3s ease-in-out',
-          '&:hover': {
-            transform: 'translateY(-8px)',
-          },
           ...(plan.recommended && {
             border: `2px solid ${theme.palette.primary.main}`,
             boxShadow: `0 8px 24px ${theme.palette.primary.main}25`
@@ -151,10 +150,12 @@ const PricingCard = ({ plan, delay }) => {
             ))}
           </List>
 
+          {/* Usar nuestro Button personalizado */}
           <Button
             fullWidth
             variant={plan.buttonVariant}
             color="primary"
+            rounded
             onClick={() => navigate(ROUTES.AUTH.SIGNUP)}
             sx={{ mt: 2 }}
           >

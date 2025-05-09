@@ -1,97 +1,86 @@
-import React, { useState } from 'react';
-import { 
-  AppBar, Toolbar, Typography, Button, Box, Container, 
-  Drawer, List, ListItem, ListItemIcon, ListItemText, IconButton 
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import SchoolIcon from '@mui/icons-material/School';
-import HelpIcon from '@mui/icons-material/Help';
+// src/shared/components/Navigation/NavBar.jsx
+import React, { useEffect } from 'react';
+import { AppBar, Toolbar, Button, Box, Container } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
+
+// Importar componentes modulares
+import MobileDrawer from './NavBarComponents/MobileDrawer';
+import BreadcrumbSection from './NavBarComponents/BreadcrumbSection';
+import NotificationsMenu from './NavBarComponents/NotificationsMenu';
+import ProfileMenu from './NavBarComponents/ProfileMenu';
 
 const NavBar = () => {
-  const { user, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const location = useLocation();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  
+  // Para depuración
+  useEffect(() => {
+    console.log("NavBar - Auth state:", { isAuthenticated, user });
+  }, [isAuthenticated, user]);
 
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
+  // Función para determinar el título de la página actual
+  const getCurrentPageTitle = () => {
+    const path = location.pathname;
+    
+    if (path.includes('/dashboard')) {
+      return 'Dashboard';
+    } else if (path.includes('/expenses')) {
+      return 'Gastos';
+    } else if (path.includes('/analysis')) {
+      return 'Análisis';
+    } else if (path.includes('/education')) {
+      return 'Educación';
+    } else if (path.includes('/help')) {
+      return 'Ayuda';
+    } else if (path.includes('/login')) {
+      return 'Iniciar Sesión';
+    } else if (path.includes('/signup')) {
+      return 'Registro';
+    } else if (path.includes('/profile')) {
+      return 'Mi Perfil';
+    } else {
+      return '';
     }
-    setDrawerOpen(open);
   };
 
-  const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Gastos', icon: <AccountBalanceWalletIcon />, path: '/expenses' },
-    { text: 'Análisis', icon: <BarChartIcon />, path: '/analysis' },
-    { text: 'Educación', icon: <SchoolIcon />, path: '/education' },
-    { text: 'Ayuda', icon: <HelpIcon />, path: '/help' },
-  ];
-
-  const drawerList = () => (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>
-        {menuItems.map((item) => (
-          <ListItem 
-            button 
-            key={item.text} 
-            component={RouterLink} 
-            to={item.path}
-            selected={location.pathname === item.path}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
+  // Función para determinar la descripción de la página actual
+  const getCurrentPageDescription = () => {
+    const path = location.pathname;
+    
+    if (path.includes('/dashboard')) {
+      return 'Resumen de tu situación financiera';
+    } else if (path.includes('/expenses')) {
+      return 'Visualiza y gestiona tus gastos';
+    } else if (path.includes('/analysis')) {
+      return 'Analiza tus finanzas personales';
+    } else if (path.includes('/education')) {
+      return 'Aprende sobre finanzas personales';
+    } else if (path.includes('/help')) {
+      return 'Obtén ayuda y soporte';
+    } else if (path.includes('/profile')) {
+      return 'Gestiona tu información personal';
+    } else {
+      return '';
+    }
+  };
 
   return (
     <AppBar position="sticky" color="default" elevation={1}>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
-          {user && (
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              onClick={toggleDrawer(true)}
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
+          {/* Menú hamburguesa */}
+          <MobileDrawer />
 
-          <Typography
-            variant="h6"
-            component={RouterLink}
-            to="/"
-            sx={{
-              flexGrow: 1,
-              textDecoration: 'none',
-              color: 'primary.main',
-              fontWeight: 700,
-              letterSpacing: 1,
-              '&:hover': {
-                color: 'primary.dark',
-              }
-            }}
-          >
-            MyEconomy
-          </Typography>
+          {/* Logo y breadcrumb */}
+          <BreadcrumbSection 
+            pageTitle={getCurrentPageTitle()} 
+            pageDescription={getCurrentPageDescription()} 
+          />
 
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            {!user ? (
+          {/* Botones de acción */}
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {!isAuthenticated ? (
               <>
                 <Button
                   color="primary"
@@ -112,34 +101,16 @@ const NavBar = () => {
               </>
             ) : (
               <>
-                <Button
-                  color="primary"
-                  component={RouterLink}
-                  to="/dashboard"
-                  variant={location.pathname.includes('/dashboard') ? 'contained' : 'text'}
-                >
-                  Dashboard
-                </Button>
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  onClick={logout}
-                >
-                  Cerrar Sesión
-                </Button>
+                {/* Icono de notificaciones */}
+                <NotificationsMenu />
+                
+                {/* Icono de perfil */}
+                <ProfileMenu />
               </>
             )}
           </Box>
         </Toolbar>
       </Container>
-
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={toggleDrawer(false)}
-      >
-        {drawerList()}
-      </Drawer>
     </AppBar>
   );
 };

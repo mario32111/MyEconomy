@@ -2,15 +2,8 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import routes from './routes';
-import Layout from '../components/Layout/Layout'; // Importar el Layout
-
-// Componente de carga simple
-const LoadingScreen = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    <span className="ml-3 text-lg text-gray-700">Cargando...</span>
-  </div>
-);
+import Layout from '../components/Navigation/Layout'; // Importar desde la nueva ubicación
+import LoadingScreen from '../components/UI/LoadingScreen';
 
 const AppRoutes = () => {
   return (
@@ -22,7 +15,12 @@ const AppRoutes = () => {
             path={route.path}
             element={
               route.withLayout !== false ? (
-                <Layout>{route.element}</Layout>
+                <Layout 
+                  maxWidth={route.maxWidth || "lg"} 
+                  disableContainer={route.disableContainer}
+                >
+                  {route.element}
+                </Layout>
               ) : (
                 route.element
               )

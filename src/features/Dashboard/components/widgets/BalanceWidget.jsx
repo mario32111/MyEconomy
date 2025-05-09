@@ -1,42 +1,83 @@
 import React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import Box from '@mui/material/Box';
-import LinearProgress from '@mui/material/LinearProgress';
+import { Box, Card, CardContent, Typography, Grid, Divider } from '@mui/material';
+import { 
+  TrendingUp as IncomeIcon, 
+  TrendingDown as ExpenseIcon
+} from '@mui/icons-material';
 
-const BalanceWidget = () => {
+const BalanceWidget = ({ balance, income, expenses }) => {
+  // Formatear números como moneda
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      minimumFractionDigits: 2
+    }).format(amount);
+  };
+
   return (
-    <Card>
+    <Card elevation={3} sx={{ height: '100%' }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Balance Total
+          Balance General
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Typography variant="h4" component="div">
-            $25,840.50
+        
+        <Box sx={{ my: 3, textAlign: 'center' }}>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+            {formatCurrency(balance)}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
-            <TrendingUpIcon color="success" />
-            <Typography variant="body2" color="success.main" sx={{ ml: 0.5 }}>
-              +6.12%
-            </Typography>
-          </Box>
-        </Box>
-        <Typography variant="body2" color="text.secondary">
-          vs mes anterior
-        </Typography>
-        <Box sx={{ mt: 2 }}>
-          <LinearProgress 
-            variant="determinate" 
-            value={70} 
-            sx={{ height: 8, borderRadius: 4 }}
-          />
-          <Typography variant="caption" color="text.secondary">
-            70% de tu meta mensual
+          <Typography variant="body2" color="text.secondary">
+            Balance Total
           </Typography>
         </Box>
+        
+        <Divider sx={{ my: 2 }} />
+        
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ 
+                bgcolor: 'success.light', 
+                borderRadius: '50%', 
+                p: 1, 
+                mr: 1,
+                display: 'flex'
+              }}>
+                <IncomeIcon color="success" />
+              </Box>
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Ingresos
+                </Typography>
+                <Typography variant="h6" component="div">
+                  {formatCurrency(income)}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          
+          <Grid item xs={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ 
+                bgcolor: 'error.light', 
+                borderRadius: '50%', 
+                p: 1, 
+                mr: 1,
+                display: 'flex'
+              }}>
+                <ExpenseIcon color="error" />
+              </Box>
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Gastos
+                </Typography>
+                <Typography variant="h6" component="div">
+                  {formatCurrency(expenses)}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   );

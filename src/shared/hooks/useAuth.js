@@ -1,76 +1,111 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
-import { ROUTES } from '../constants/routes';
+import authService from '../services/authService';
+import APP_CONFIG from '../config/app.config';
 
+/**
+ * Hook personalizado para gestionar la autenticación
+ * Proporciona funciones para login, logout, registro y verificación de estado
+ */
 export const useAuth = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
-  const [user, setUser] = useState(authService.getCurrentUser());
-  const [loading, setLoading] = useState(false);
 
+  // Cargar usuario al iniciar
   useEffect(() => {
-    // Verificar autenticación al montar el componente
-    setIsAuthenticated(authService.isAuthenticated());
-    setUser(authService.getCurrentUser());
+    const checkAuth = async () => {
+      setLoading(true);
+      try {
+        // Verificar token en localStorage
+        const token = localStorage.getItem(APP_CONFIG.auth.tokenKey);
+        
+        if (token) {
+          // Verificar si el token es válido
+          const userData = await authService.getCurrentUser();
+          setUser(userData);
+        }
+      } catch (err) {
+        console.error('Error al verificar autenticación:', err);
+        // Limpiar token inválido
+        localStorage.removeItem(APP_CONFIG.auth.tokenKey);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
-  const login = useCallback(async (credentials) => {
+  // Función de login
+  const login = async (email, password) => {
     setLoading(true);
+    setError(null);
+    
     try {
-      const response = await authService.login(credentials);
-      setIsAuthenticated(true);
-      setUser(response.data.user);
-      navigate(ROUTES.DASHBOARD);
-      return { data: response.data, error: null };
-    } catch (error) {
-      return { data: null, error };
-    } finally {
-      setLoading(false);
-    }
-  }, [navigate]);
-
-  const signup = useCallback(async (email, password, userData) => {
-    setLoading(true);
-    try {
-      const response = await authService.register({
-        email,
-        password,
-        name: userData.name,
-        monthlyIncome: userData.monthlyIncome,
-        currentSavings: userData.currentSavings,
-        monthlyExpenses: userData.monthlyExpenses,
-        primaryGoal: userData.primaryGoal,
-        timeframe: userData.timeframe,
-        savingsGoal: userData.savingsGoal,
-        riskTolerance: userData.riskTolerance,
-        budgetType: userData.budgetType,
-        notificationPreference: userData.notificationPreference
-      });
+      const response = await authService.login(email, password);
       
-      setIsAuthenticated(true);
-      setUser(response.data.user);
-      return { data: response.data, error: null };
-    } catch (error) {
-      return { data: null, error };
+      // Guardar token
+      localStorage.setItem(APP_CONFIG.auth.tokenKey, response.token);
+      
+      // Establecer usuario
+      setUser(response.user);
+      
+      return response.user;
+    } catch (err) {
+      setError(err.message || 'Error al iniciar sesión');
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const logout = useCallback(() => {
-    authService.logout();
-    setIsAuthenticated(false);
+  // Función de registro
+  const signup = async (userData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await authService.signup(userData);
+      
+      // Guardar token si el registro también hace login
+      if (response.token) {
+        localStorage.setItem(APP_CONFIG.auth.tokenKey, response.token);
+        setUser(response.user);
+      }
+      
+      return response;
+    } catch (err) {
+      setError(err.message || 'Error al registrarse');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función de logout
+  const logout = () => {
+    localStorage.removeItem(APP_CONFIG.auth.tokenKey);
     setUser(null);
-    navigate(ROUTES.HOME);
-  }, [navigate]);
+    navigate('/login');
+  };
 
-  return {
-    isAuthenticated,
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = () => {
+    return !!user;
+  };
+
+  return { 
     user,
     loading,
+    error,
     login,
     signup,
-    logout
+    logout,
+    isAuthenticated
   };
 };
+
+export default useAuth;

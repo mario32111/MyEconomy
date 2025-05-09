@@ -24,14 +24,14 @@ const AppRoutes = () => {
       <Route path="/" element={<HomePage />} />
       <Route 
         path="/login" 
-        element={user ? <Navigate to="/dashboard" /> : <LoginPage />} 
+        element={user ? <Navigate to="/expense-tracker" /> : <LoginPage />} 
       />
       <Route 
         path="/signup" 
-        element={user ? <Navigate to="/dashboard" /> : <SignUpPage />} 
+        element={user ? <Navigate to="/expense-tracker" /> : <SignUpPage />} 
       />
       <Route
-        path="/dashboard/*"
+        path="/expense-tracker/*"
         element={
           <PrivateRoute>
             <ExpenseTracker />
