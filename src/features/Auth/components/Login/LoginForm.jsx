@@ -36,7 +36,7 @@ const LoginForm = () => {
       const result = await login(formData.email, formData.password);
       console.log('Resultado de login:', result);
       
-      navigate('/dashboard');
+      navigate('/expense-tracker');
     } catch (error) {
       console.error('Error completo:', error);
       setError(error.message || 'Error al iniciar sesión');

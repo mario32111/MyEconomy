@@ -8,7 +8,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 280px);
   min-height: 600px;
 }
 
@@ -112,7 +112,7 @@
   color: #6b7280;
 }
 
-.inputWithIcon .formInput {
+.inputWithIcon .formInput, .inputWithIcon .formSelect {
   padding-left: 2rem;
 }
 
@@ -367,7 +367,7 @@
   position: sticky;
   bottom: 0;
   background-color: white;
-  padding-top: 1rem;
+  padding: 1rem 1.5rem;
   border-top: 1px solid #f3f4f6;
 }
 
@@ -418,6 +418,9 @@
   color: #4b5563;
   cursor: pointer;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .segmentActive {
@@ -502,4 +505,170 @@
 .expandableText.expanded {
   white-space: normal;
   max-height: none;
+}
+
+/* Nuevos estilos para las estadísticas */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.statIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.statInfo {
+  flex: 1;
+}
+
+.statTitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.statTrend {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Estilos para la mini gráfica de barras */
+.miniBarChart {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.chartTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+}
+
+.barContainer {
+  margin-bottom: 0.75rem;
+}
+
+.barLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.barWrapper {
+  height: 0.5rem;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.barIncome {
+  height: 100%;
+  background-color: #10b981;
+  border-radius: 9999px;
+}
+
+.barExpense {
+  height: 100%;
+  background-color: #ef4444;
+  border-radius: 9999px;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+/* Estilos adicionales para ExpenseTracker.module.css */
+
+/* Tarjeta básica */
+.card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  height: 100%;
+}
+
+/* Botones */
+.buttonPrimary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buttonPrimary:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.buttonPrimary:active {
+  transform: translateY(0);
+}
+
+.buttonOutlined {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buttonOutlined:hover {
+  background-color: #f9fafb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.buttonOutlined:active {
+  transform: translateY(0);
 }

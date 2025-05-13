@@ -1,4 +1,3 @@
-// src/shared/components/Navigation/NavBarComponents/ProfileMenu.jsx
 import React, { useEffect, useState } from 'react';
 import { 
   Menu, MenuItem, ListItemIcon, ListItemText, Divider, 
@@ -7,11 +6,13 @@ import {
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 
 const ProfileMenu = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userInfo, setUserInfo] = useState({
@@ -25,24 +26,21 @@ const ProfileMenu = () => {
     if (user) {
       // Intentar obtener el email de diferentes ubicaciones posibles
       const email = user.email || 
-        (user.user_metadata && user.user_metadata.email) || 
-        (user.data && user.data.email) || 
-        'usuario@ejemplo.com';
-      
+                   (user.user_metadata && user.user_metadata.email) || 
+                   (user.data && user.data.email) || 
+                   'usuario@ejemplo.com';
+
       // Intentar obtener el nombre de diferentes ubicaciones posibles
       const name = user.name || 
-        (user.user_metadata && user.user_metadata.name) || 
-        (user.data && user.data.name) || 
-        email.split('@')[0] || 
-        'Usuario';
-      
+                  (user.user_metadata && user.user_metadata.name) || 
+                  (user.data && user.data.name) || 
+                  email.split('@')[0] || 
+                  'Usuario';
+
       // Obtener la inicial para el avatar
       const initial = (name.charAt(0) || email.charAt(0) || 'U').toUpperCase();
-      
+
       setUserInfo({ name, email, initial });
-      
-      // Para depuración
-      console.log("ProfileMenu - User info:", { user, extracted: { name, email, initial } });
     }
   }, [user]);
 
@@ -57,8 +55,22 @@ const ProfileMenu = () => {
   const handleLogout = async () => {
     await logout();
     handleClose();
-    navigate('/');
+    navigate('/login');
   };
+
+  // Si no está autenticado, mostrar botón de login
+  if (!isAuthenticated()) {
+    return (
+      <IconButton 
+        color="inherit" 
+        component={RouterLink}
+        to="/login"
+        size="large"
+      >
+        <PersonIcon />
+      </IconButton>
+    );
+  }
 
   return (
     <>
@@ -71,7 +83,7 @@ const ProfileMenu = () => {
           {userInfo.initial}
         </Avatar>
       </IconButton>
-      
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -103,6 +115,18 @@ const ProfileMenu = () => {
             <PersonIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Mi Perfil" />
+        </MenuItem>
+        <MenuItem component={RouterLink} to="/expense-tracker" onClick={handleClose}>
+          <ListItemIcon>
+            <AccountBalanceWalletIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Mis Finanzas" />
+        </MenuItem>
+        <MenuItem component={RouterLink} to="/ventas" onClick={handleClose}>
+          <ListItemIcon>
+          <BusinessCenterIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Perfil Empresario" />
         </MenuItem>
         <MenuItem component={RouterLink} to="/settings" onClick={handleClose}>
           <ListItemIcon>

@@ -28,6 +28,7 @@ import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import ForumIcon from '@mui/icons-material/Forum';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ForestIcon from '@mui/icons-material/Forest';
 
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth'; // Importar desde hooks/useAuth
@@ -41,69 +42,70 @@ const menuStructure = [
     requiresAuth: true
   },
   { 
-    text: 'Finance', 
+    text: 'Finanzas', 
     icon: <AccountBalanceWalletIcon />, 
     requiresAuth: true,
     subItems: [
-      { text: 'Expense Tracker', path: '/finance/expense-tracker', icon: <BarChartIcon /> },
-      { text: 'Financial Goals', path: '/finance/financial-goals', icon: <TimelineIcon /> },
-      { text: 'Planner Tool', path: '/finance/planner-tool', icon: <AssignmentIcon /> },
-      { text: 'Rate Scout', path: '/finance/rate-scout', icon: <CompareArrowsIcon /> },
-      { text: 'Simulator', path: '/finance/simulator', icon: <CalculateIcon /> },
-      { text: 'Custom Calculator', path: '/finance/custom-calculator', icon: <CalculateIcon /> }
+      { text: 'Seguimiento de Gastos', path: '/expense-tracker', icon: <BarChartIcon /> },
+      { text: 'Metas Financieras', path: '/finance/financial-goals', icon: <TimelineIcon /> },
+      { text: 'Planificador', path: '/finance/planner-tool', icon: <AssignmentIcon /> },
+      { text: 'Comparador de Tasas', path: '/finance/rate-scout', icon: <CompareArrowsIcon /> },
+      { text: 'Simulador', path: '/finance/simulator', icon: <CalculateIcon /> }
     ]
   },
   { 
-    text: 'IA', 
+    text: 'Asistente IA', 
     icon: <SmartToyIcon />, 
     requiresAuth: true,
     subItems: [
-      { text: 'Chat IA', path: '/ia/chat-ia', icon: <ChatIcon /> },
-      { text: 'Debt Simulator', path: '/ia/debt-simulator', icon: <AccountBalanceIcon /> },
-      { text: 'Recovery Planner', path: '/ia/recovery-planner', icon: <SettingsBackupRestoreIcon /> }
+      { text: 'Chat IA', path: '/chat-ia', icon: <ChatIcon /> },
+      { text: 'Simulador de Deudas', path: '/debt-simulator', icon: <AccountBalanceIcon /> },
+      { text: 'Plan de Recuperación', path: '/recovery-planner', icon: <SettingsBackupRestoreIcon /> }
     ]
   },
   { 
-    text: 'Monitoring', 
+    text: 'Monitoreo', 
     icon: <MonitorIcon />, 
     requiresAuth: true,
     subItems: [
-      { text: 'Finance Hub', path: '/monitoring/finance-hub', icon: <AssessmentIcon /> }
+      { text: 'Centro Financiero', path: '/monitoring/finance-hub', icon: <AssessmentIcon /> }
     ]
   },
   { 
-    text: 'Education', 
+    text: 'Educación', 
     icon: <SchoolIcon />, 
     requiresAuth: true,
     subItems: [
-      { text: 'Course List', path: '/education/course-list', icon: <MenuBookIcon /> },
-      { text: 'Progress', path: '/education/progress', icon: <TimelineIcon /> }
+      { text: 'Cursos', path: '/education/courses', icon: <MenuBookIcon /> },
+      { text: 'Nuevos Cursos', path: '/education/courses/:courseId', icon: <MenuBookIcon /> },
+      { text: 'Mi Progreso', path: '/education/progress', icon: <TimelineIcon /> },
+      { text: 'Gardin', path: '/education/tree-selection', icon: <ForestIcon /> }
     ]
   },
   { 
-    text: 'Shopping', 
+    text: 'Compras', 
     icon: <ShoppingCartIcon />, 
     path: '/shopping',
     requiresAuth: true
   },
   { 
-    text: 'Support', 
+    text: 'Soporte', 
     icon: <SupportIcon />, 
     requiresAuth: true,
     subItems: [
-      { text: 'FAQ', path: '/support/faq', icon: <LiveHelpIcon /> },
-      { text: 'Live Chat', path: '/support/live-chat', icon: <ForumIcon /> }
+      { text: 'Preguntas Frecuentes', path: '/support/faq', icon: <LiveHelpIcon /> },
+      { text: 'Chat en Vivo', path: '/support/live-chat', icon: <ForumIcon /> }
     ]
   },
   { 
-    text: 'Login', 
+    text: 'Iniciar Sesión', 
     icon: <LoginIcon />, 
     path: '/login',
     requiresAuth: false,
     hideWhenAuth: true
   },
   { 
-    text: 'Sign Up', 
+    text: 'Registrarse', 
     icon: <PersonAddIcon />, 
     path: '/signup',
     requiresAuth: false,
@@ -116,9 +118,6 @@ const MobileDrawer = () => {
   const [open, setOpen] = React.useState(false);
   const [expandedItems, setExpandedItems] = React.useState({});
   const { user, isAuthenticated } = useAuth(); // Usar el hook personalizado
-
-  // Para depuración
-  console.log("Auth state in MobileDrawer:", { isAuthenticated, user });
 
   const toggleDrawer = (isOpen) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -136,7 +135,7 @@ const MobileDrawer = () => {
 
   // Filtrar elementos del menú según el estado de autenticación
   const filteredMenuItems = menuStructure.filter(item => {
-    if (isAuthenticated) {
+    if (isAuthenticated()) {
       return !item.hideWhenAuth;
     } else {
       return !item.requiresAuth;

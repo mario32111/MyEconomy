@@ -1,4 +1,3 @@
-// src/features/Auth/components/Register/RegisterWizard.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
@@ -8,13 +7,14 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import QuestionnaireStep from './QuestionnaireStep';
-import authService from '../../../../shared/services/authService';
+import QuestionnaireStep from '../../../../shared/components/Forms/QuestionnaireStep/QuestionnaireStep';
+import { useAuthContext } from '../../../../shared/contexts/AuthContext';
 
 const steps = ['Información básica', 'Perfil financiero', 'Objetivos', 'Preferencias'];
 
 const RegisterWizard = () => {
   const navigate = useNavigate();
+  const { signup } = useAuthContext();
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -215,7 +215,7 @@ const RegisterWizard = () => {
       }
       
       // Validar formato de email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
       if (!emailRegex.test(userData.email)) {
         setError('Por favor ingresa un correo electrónico válido');
         return false;
@@ -244,7 +244,6 @@ const RegisterWizard = () => {
   };
 
   const handleSkip = () => {
-    // Solo permitir saltar pasos después del primero
     if (activeStep > 0) {
       setActiveStep((prevStep) => prevStep + 1);
       setError('');
@@ -266,8 +265,7 @@ const RegisterWizard = () => {
         maternalLastName: userData.maternalLastName,
         email: userData.email,
         password: userData.password,
-        confirmPassword: userData.confirmPassword,
-        // Incluir datos financieros opcionales si están disponibles
+        // Incluir datos financieros opcionales
         monthlyIncome: userData.monthlyIncome || '',
         currentSavings: userData.currentSavings || '',
         monthlyExpenses: userData.monthlyExpenses || '',
@@ -280,16 +278,28 @@ const RegisterWizard = () => {
       };
       
       console.log('Enviando datos al servidor:', registrationData);
-      console.log('URL de la API:', process.env.REACT_APP_API_URL || 'http://localhost:5000/api');
       
-      // Registrar usuario usando el servicio de autenticación
-      const response = await authService.register(registrationData);
+      // Usar el método signup del contexto de autenticación
+      const response = await signup(registrationData);
       
       console.log('Respuesta del servidor:', response);
       
       if (!response.success) {
         throw new Error(response.error?.message || 'Error al registrar usuario');
       }
+      
+      // Guardar datos financieros en localStorage para acceso rápido
+      localStorage.setItem('financial_data', JSON.stringify({
+        monthlyIncome: userData.monthlyIncome || '',
+        currentSavings: userData.currentSavings || '',
+        monthlyExpenses: userData.monthlyExpenses || '',
+        primaryGoal: userData.primaryGoal || '',
+        timeframe: userData.timeframe || '',
+        savingsGoal: userData.savingsGoal || '',
+        riskTolerance: userData.riskTolerance || '',
+        budgetType: userData.budgetType || '',
+        notificationPreference: userData.notificationPreference || ''
+      }));
       
       // Extraer el dominio del correo para mostrar el enlace
       const emailDomain = userData.email.split('@')[1];
@@ -394,7 +404,6 @@ const RegisterWizard = () => {
                 Atrás
               </Button>
               
-              {/* Botón de saltar solo para pasos opcionales (después del paso 1) */}
               {activeStep > 0 && (
                 <Button
                   onClick={handleSkip}

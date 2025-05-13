@@ -1,69 +1,104 @@
 // src/features/User/Profile/ProfilePage.jsx
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Tab, Tabs, Alert } from '@mui/material';
-import { useAuth } from '../../../shared/hooks/useAuth';
+import { Container, Grid, Typography, Paper, Alert, CircularProgress } from '@mui/material';
 import ProfileHeader from './components/ProfileHeader';
 import ProfileForm from './components/ProfileForm';
 import SecuritySettings from './components/SecuritySettings';
+import { useAuth } from '../../../shared/hooks/useAuth';
+// Importar funciones individuales en lugar del servicio completo
+import { getProfile } from '../../../shared/services/profileService';
 
 const ProfilePage = () => {
-  const { user, isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState(0);
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Inicializar los datos del perfil con los del usuario autenticado
   useEffect(() => {
+    const loadProfile = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const response = await getProfile(user.id);
+        if (response.success) {
+          setProfileData(response.data);
+        } else {
+          setError('No se pudo cargar la información del perfil');
+        }
+      } catch (err) {
+        console.error('Error al cargar perfil:', err);
+        setError('Error al cargar la información del perfil');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (user) {
-      setProfileData(user);
-      console.log("User data loaded in ProfilePage:", user);
+      loadProfile();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
+  const handleProfileUpdate = (updatedData) => {
+    setProfileData(prev => ({
+      ...prev,
+      ...updatedData
+    }));
   };
 
-  const handleProfileUpdate = (updatedUserData) => {
-    setProfileData(updatedUserData);
-    console.log("Profile updated:", updatedUserData);
+  // Preparar datos de usuario para los componentes
+  const userData = {
+    id: user?.id,
+    email: user?.email,
+    name: profileData ? `${profileData.firstName || ''} ${profileData.paternalLastName || ''}`.trim() : user?.email?.split('@')[0] || 'Usuario',
+    createdAt: user?.createdAt || new Date(),
+    ...profileData
   };
 
-  // Si no hay usuario autenticado, mostrar mensaje
-  if (!isAuthenticated || !user) {
+  if (!user) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ my: 2 }}>
-          Debes iniciar sesión para ver tu perfil.
-        </Alert>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Paper elevation={1} sx={{ p: 3, mb: 3, textAlign: 'center' }}>
+          <Typography variant="h6">Debes iniciar sesión para ver tu perfil</Typography>
+        </Paper>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
         Mi Perfil
       </Typography>
       
-      <ProfileHeader user={profileData || user} />
-      
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs 
-          value={activeTab} 
-          onChange={handleTabChange}
-          aria-label="profile tabs"
-        >
-          <Tab label="Información Personal" />
-          <Tab label="Seguridad" />
-        </Tabs>
-      </Box>
-      
-      {activeTab === 0 && (
-        <ProfileForm user={profileData || user} onProfileUpdate={handleProfileUpdate} />
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
       )}
       
-      {activeTab === 1 && (
-        <SecuritySettings />
+      {loading ? (
+        <Paper elevation={1} sx={{ p: 3, mb: 3, display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Paper>
+      ) : (
+        <>
+          <ProfileHeader user={userData} />
+          
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <ProfileForm 
+                user={userData} 
+                onProfileUpdate={handleProfileUpdate} 
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <SecuritySettings />
+            </Grid>
+          </Grid>
+        </>
       )}
     </Container>
   );

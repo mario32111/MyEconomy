@@ -1,25 +1,9 @@
-// backend/controllers/authController.js
-
-const { User } = require('../models');
 const jwt = require('jsonwebtoken');
-const { Op } = require('sequelize');
-const supabase = require('../config/supabaseClient'); // Importa el cliente Supabase
+const supabase = require('../config/supabaseClient');
+const { formatResponse } = require('../utils/responseFormatter');
 
-// --- Generar Token JWT ---
-const generateToken = (user) => {
-  if (!process.env.JWT_SECRET) {
-    console.error('¡Error Crítico! JWT_SECRET no está definido en .env');
-    return null;
-  }
-  return jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-};
-
-// --- Registro de Usuario ---
-exports.register = async (req, res, next) => {
+// Registro de usuario
+exports.register = async (req, res) => {
   try {
     const {
       firstName,
@@ -28,7 +12,6 @@ exports.register = async (req, res, next) => {
       maternalLastName,
       email,
       password,
-      confirmPassword,
       // Campos opcionales
       monthlyIncome,
       currentSavings,
@@ -41,295 +24,181 @@ exports.register = async (req, res, next) => {
       notificationPreference
     } = req.body;
 
-    console.log('Datos recibidos para registro:', req.body);
+    // Verificar si el usuario ya existe
+    const { data: existingUser, error: checkError } = await supabase.auth.admin.getUserByEmail(email);
 
-    // Validar que las contraseñas coincidan
-    if (password !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'Las contraseñas no coinciden.' }
-      });
-    }
-
-    // --- 1. Verificar si el usuario ya existe en PostgreSQL ---
-    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'El email ya está registrado en la base de datos.' }
-      });
+      return res.status(400).json(
+        formatResponse(false, null, { message: 'El correo electrónico ya está registrado' })
+      );
     }
 
-    // Crear nombre completo para compatibilidad
-    const fullName = `${firstName} ${middleName ? middleName + ' ' : ''}${paternalLastName} ${maternalLastName || ''}`.trim();
-
-    // Crear usuario en la base de datos local
-    const user = await User.create({
-      firstName,
-      middleName: middleName || null,
-      paternalLastName,
-      maternalLastName: maternalLastName || null,
+    // Crear usuario en Supabase Auth con metadatos
+    const { data: authUser, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      emailVerified: true, // Asumimos que no requieres verificación por email
-      isActive: true,
-      // Datos financieros y preferencias (opcionales)
-      monthlyIncome: monthlyIncome || 0,
-      currentSavings: currentSavings || 0,
-      monthlyExpenses: monthlyExpenses || 0,
-      primaryGoal: primaryGoal || '',
-      timeframe: timeframe || '',
-      savingsGoal: savingsGoal || 0,
-      riskTolerance: riskTolerance || '',
-      budgetType: budgetType || '',
-      notificationPreference: notificationPreference || ''
-    });
-
-    // Registrar usuario en Supabase
-    let supabaseUserId = null;
-    if (supabase) {
-      console.log(`Intentando registrar ${email} en Supabase Auth...`);
-      const { data: supabaseData, error: supabaseError } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            firstName,
-            middleName,
-            paternalLastName,
-            maternalLastName,
-            fullName
-          }
+      options: {
+        data: {
+          firstName,
+          middleName,
+          paternalLastName,
+          maternalLastName,
+          monthlyIncome,
+          currentSavings,
+          monthlyExpenses,
+          primaryGoal,
+          timeframe,
+          savingsGoal,
+          riskTolerance,
+          budgetType,
+          notificationPreference
         }
-      });
-
-      if (supabaseError) {
-        console.error('Error al registrar en Supabase Auth:', supabaseError.message);
-        // Continuamos a pesar del error en Supabase, pero lo registramos
-      } else if (supabaseData.user) {
-        console.log(`Usuario ${email} registrado exitosamente en Supabase Auth con ID: ${supabaseData.user.id}`);
-        supabaseUserId = supabaseData.user.id;
-        
-        // Actualizar el ID de Supabase en nuestro modelo
-        user.supabaseUserId = supabaseUserId;
-        await user.save();
-      }
-    } else {
-      console.warn('Cliente Supabase no disponible. Saltando registro en Supabase Auth.');
-    }
-
-    // Generar JWT para tu aplicación
-    const token = generateToken(user);
-    if (!token) {
-      return res.status(500).json({
-        success: false,
-        error: { message: 'Error interno al generar el token de sesión.' }
-      });
-    }
-
-    // Enviar Respuesta Exitosa 
-    res.status(201).json({
-      success: true,
-      data: {
-        user: {
-          id: user.id,
-          firstName: user.firstName,
-          middleName: user.middleName,
-          paternalLastName: user.paternalLastName,
-          maternalLastName: user.maternalLastName,
-          email: user.email,
-          emailVerified: user.emailVerified
-        },
-        token,
-        supabaseUserId
       }
     });
 
-  } catch (error) {
-    // Captura error inesperado
-    console.error('Error detallado en registro (catch general):', error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        error: { message: error.message || 'Error interno del servidor' }
-      });
+    if (authError) {
+      return res.status(400).json(
+        formatResponse(false, null, { message: authError.message })
+      );
     }
+
+    // El trigger en Supabase creará automáticamente el perfil
+
+    // Generar JWT
+    const token = jwt.sign(
+      { id: authUser.user.id, email: authUser.user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    // Obtener el perfil recién creado
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', authUser.user.id)
+      .single();
+
+    if (profileError) {
+      console.warn('Perfil no encontrado inmediatamente después del registro:', profileError);
+    }
+
+    return res.status(201).json(
+      formatResponse(true, { 
+        user: {
+          id: authUser.user.id,
+          email: authUser.user.email,
+          firstName,
+          middleName,
+          paternalLastName,
+          maternalLastName,
+          ...userProfile
+        }, 
+        token 
+      }, null)
+    );
+  } catch (error) {
+    console.error('Error en registro:', error);
+    return res.status(500).json(
+      formatResponse(false, null, { message: 'Error en el servidor' })
+    );
   }
 };
 
-// --- Inicio de Sesión ---
-exports.login = async (req, res, next) => {
+// Login de usuario
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Buscar usuario en tu base de datos
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: { message: 'Credenciales inválidas (email no encontrado)' }
-      });
-    }
-
-    if (user.isLocked && user.isLocked()) {
-      const lockTime = user.lockUntil ? new Date(user.lockUntil).toLocaleString() : 'pronto';
-      return res.status(423).json({ // 423 Locked
-        success: false,
-        error: {
-          message: `Cuenta bloqueada. Intente nuevamente después de ${lockTime}`
-        }
-      });
-    }
-
-    // Verificar contraseña
-    const isValidPassword = await user.validatePassword(password);
-    if (!isValidPassword) {
-      // Incrementar intentos fallidos
-      if (user.incrementLoginAttempts) {
-        await user.incrementLoginAttempts();
-      }
-      return res.status(401).json({
-        success: false,
-        error: {
-          message: 'Credenciales inválidas (contraseña incorrecta)',
-          //mostrar intentos restantes
-        }
-      });
-    }
-
-    // Verificar si el email está verificado
-    if (!user.emailVerified) {
-      return res.status(403).json({ // 403 Forbidden
-        success: false,
-        error: { message: 'Por favor verifique su email antes de iniciar sesión' }
-      });
-    }
-
-    // Resetear intentos de login si la contraseña fue correcta
-    if (user.resetLoginAttempts) {
-      await user.resetLoginAttempts();
-    }
-
-    // Generar token JWT para tu aplicación
-    const token = generateToken(user);
-    if (!token) {
-      return res.status(500).json({
-        success: false,
-        error: { message: 'Error interno al generar el token de sesión.' }
-      });
-    }
-
-    // Enviar respuesta exitosa
-    res.json({
-      success: true,
-      data: {
-        user: { // Devuelve solo la información necesaria del usuario
-          id: user.id,
-          firstName: user.firstName,
-          paternalLastName: user.paternalLastName,
-          email: user.email,
-          emailVerified: user.emailVerified
-        },
-        token
-      }
+    // Autenticar con Supabase
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password
     });
+
+    if (authError) {
+      return res.status(401).json(
+        formatResponse(false, null, { message: 'Credenciales inválidas' })
+      );
+    }
+
+    // Obtener datos del perfil del usuario
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profileError) {
+      return res.status(404).json(
+        formatResponse(false, null, { message: 'Perfil de usuario no encontrado' })
+      );
+    }
+
+    // Generar JWT
+    const token = jwt.sign(
+      { id: data.user.id, email: data.user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    return res.status(200).json(
+      formatResponse(true, { 
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          ...userProfile
+        }, 
+        token 
+      }, null)
+    );
   } catch (error) {
-    console.error('Error detallado en login:', error);
-    next(error);
+    console.error('Error en login:', error);
+    return res.status(500).json(
+      formatResponse(false, null, { message: 'Error en el servidor' })
+    );
   }
 };
 
-// Resto de funciones sin cambios...
-exports.verifyEmail = async (req, res, next) => {
+// Sincronizar datos del usuario
+exports.syncUser = async (req, res) => {
   try {
-    const { token: verificationToken } = req.params; 
-    if (!verificationToken) {
-      return res.status(400).json({ success: false, error: { message: 'Token de verificación no proporcionado.' } });
+    const userId = req.user.id;
+    
+    // Obtener datos actualizados del perfil
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      return res.status(404).json(
+        formatResponse(false, null, { message: 'Perfil de usuario no encontrado' })
+      );
     }
 
-    // Busca al usuario por el token y verifica que no haya expirado
-    const user = await User.findOne({
-      where: {
-        emailVerificationToken: verificationToken,
-        // Comprueba que la fecha de expiración sea mayor que la fecha actual
-        emailVerificationExpires: { [Op.gt]: new Date() }
-      }
-    });
+    // Obtener datos del usuario de auth
+    const { data: authUser, error: authError } = await supabase.auth.getUser();
 
-    if (!user) {
-      // Podría ser un token inválido, expirado o ya usado
-      return res.status(400).json({
-        success: false,
-        error: { message: 'Token de verificación inválido, expirado o ya utilizado.' }
-      });
+    if (authError) {
+      return res.status(401).json(
+        formatResponse(false, null, { message: 'Usuario no autenticado' })
+      );
     }
-    user.emailVerified = true;
-    user.isActive = true; // Activar la cuenta
-    user.emailVerificationToken = null; // Limpiar token para que no se reutilice
-    user.emailVerificationExpires = null; // Limpiar fecha de expiración
-    await user.save();
 
-    // Respuesta exitosa
-    res.json({
-      success: true,
-      message: 'Email verificado correctamente. Ahora puedes iniciar sesión.'
-    });
-  } catch (error) {
-    console.error('Error detallado en verificación de email:', error);
-    next(error);
-  }
-};
-
-exports.verifyEmailForce = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    
-    if (!email) {
-      return res.status(400).json({ 
-        success: false, 
-        error: { message: 'Email no proporcionado' } 
-      });
-    }
-    
-    // Buscar usuario por email
-    const user = await User.findOne({ where: { email } });
-    
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        error: { message: 'Usuario no encontrado' } 
-      });
-    }
-    
-    // Marcar email como verificado
-    user.emailVerified = true;
-    user.isActive = true;
-    await user.save();
-    
-    // También actualizar en Supabase si está disponible
-    if (supabase) {
-      try {
-        // Buscar usuario en Supabase
-        const { data: supabaseUser, error: findError } = await supabase.auth.admin.getUserByEmail(email);
-        
-        if (!findError && supabaseUser) {
-          // Actualizar metadatos para marcar como verificado
-          await supabase.auth.admin.updateUserById(supabaseUser.id, {
-            email_confirm: true,
-            user_metadata: { ...supabaseUser.user_metadata, emailVerified: true }
-          });
+    return res.status(200).json(
+      formatResponse(true, { 
+        user: {
+          id: userId,
+          email: authUser.user.email,
+          ...userProfile
         }
-      } catch (supabaseError) {
-        console.error('Error al actualizar usuario en Supabase:', supabaseError);
-      }
-    }
-    
-    res.json({
-      success: true,
-      message: 'Email verificado correctamente'
-    });
+      }, null)
+    );
   } catch (error) {
-    console.error('Error al verificar email forzadamente:', error);
-    next(error);
+    console.error('Error al sincronizar usuario:', error);
+    return res.status(500).json(
+      formatResponse(false, null, { message: 'Error en el servidor' })
+    );
   }
 };

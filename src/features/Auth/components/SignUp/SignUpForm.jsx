@@ -10,8 +10,7 @@ import {
   Alert
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import ROUTES from '../../../../shared/routes/routes';
+import { authService } from '../../../../shared/services/authService';
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -45,22 +44,26 @@ const SignUpForm = () => {
     }
 
     try {
-      const response = await axios.post('/api/auth/register', formData);
+      // Usar authService en lugar de axios
+      const result = await authService.register({
+        firstName: formData.firstName,
+        middleName: formData.middleName,
+        paternalLastName: formData.paternalLastName,
+        maternalLastName: formData.maternalLastName,
+        email: formData.email,
+        password: formData.password
+      });
       
-      if (response.data.success) {
-        // Guardar token en localStorage o en un contexto de autenticación
-        localStorage.setItem('token', response.data.data.token);
-        
-        // Redirigir al dashboard o a completar perfil
-        navigate(ROUTES.DASHBOARD);
+      if (result.success) {
+        // Redirigir al expense-tracker (que parece ser tu dashboard)
+        navigate('/expense-tracker');
       } else {
-        setError(response.data.error?.message || 'Error al registrar usuario');
+        setError(result.error?.message || 'Error al registrar usuario');
       }
     } catch (err) {
       console.error('Error en registro:', err);
       setError(
-        err.response?.data?.error?.message || 
-        'Error al conectar con el servidor. Intente nuevamente.'
+        err.message || 'Error al conectar con el servidor. Intente nuevamente.'
       );
     } finally {
       setLoading(false);
@@ -177,7 +180,7 @@ const SignUpForm = () => {
             ¿Ya tienes una cuenta?{' '}
             <Button 
               color="primary" 
-              onClick={() => navigate(ROUTES.AUTH.LOGIN)}
+              onClick={() => navigate('/login')}
               sx={{ p: 0, minWidth: 'auto', textTransform: 'none' }}
             >
               Inicia sesión

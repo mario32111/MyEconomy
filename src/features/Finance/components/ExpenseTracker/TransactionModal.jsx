@@ -1,95 +1,134 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styles from './ExpenseTracker.module.css';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import styles from './ExpenseTracker.module.css';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import EventIcon from '@mui/icons-material/Event';
+import CategoryIcon from '@mui/icons-material/Category';
+import CloseIcon from '@mui/icons-material/Close';
+import NotesIcon from '@mui/icons-material/Notes';
+import DescriptionIcon from '@mui/icons-material/Description';
 
-const TransactionModal = ({ isOpen, onClose, transaction, categories, onSave, selectedDate }) => {
+const TransactionModal = ({ 
+  isOpen, 
+  onClose, 
+  transaction, 
+  categories, 
+  onSave,
+  selectedDate 
+}) => {
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
-    type: 'expense',
     category: '',
     date: format(new Date(), 'yyyy-MM-dd'),
-    notes: ''
+    notes: '',
+    type: 'expense'
   });
 
-  const modalRef = useRef(null);
+  const [errors, setErrors] = useState({});
 
+  // Inicializar el formulario cuando se abre el modal
   useEffect(() => {
     if (transaction) {
+      // Para transacción existente, usar la fecha de la transacción
+      const transactionDate = new Date(transaction.date);
+      // Ajustar la zona horaria para evitar problemas con UTC
+      transactionDate.setMinutes(transactionDate.getMinutes() + transactionDate.getTimezoneOffset());
+
       setFormData({
         id: transaction.id,
         description: transaction.description || '',
         amount: Math.abs(transaction.amount).toString() || '',
-        type: transaction.amount < 0 ? 'expense' : 'income',
         category: transaction.category || '',
-        date: transaction.date ? format(new Date(transaction.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
-        notes: transaction.notes || ''
+        date: format(transactionDate, 'yyyy-MM-dd'),
+        notes: transaction.notes || '',
+        type: transaction.amount < 0 ? 'expense' : 'income'
       });
     } else {
+      // Para nueva transacción, usar la fecha seleccionada
+      // Ajustar la zona horaria para evitar problemas con UTC
+      const adjustedDate = new Date(selectedDate);
+      adjustedDate.setMinutes(adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset());
+
       setFormData({
         description: '',
         amount: '',
-        type: 'expense',
         category: '',
-        date: format(selectedDate || new Date(), 'yyyy-MM-dd'),
-        notes: ''
+        date: format(adjustedDate, 'yyyy-MM-dd'),
+        notes: '',
+        type: 'expense'
       });
     }
   }, [transaction, selectedDate]);
 
-  // Cerrar modal al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+
+    // Limpiar error del campo
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: null
+      });
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleTypeChange = (type) => {
+    setFormData({
+      ...formData,
+      type
+    });
+  };
 
-    // Validar campos requeridos
-    if (!formData.description || !formData.amount || !formData.category) {
-      alert('Por favor completa todos los campos requeridos');
-      return;
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.description.trim()) {
+      newErrors.description = 'La descripción es requerida';
     }
 
-    // Convertir monto a número y aplicar signo según tipo
-    const amount = parseFloat(formData.amount);
-    if (isNaN(amount)) {
-      alert('Por favor ingresa un monto válido');
-      return;
+    if (!formData.amount) {
+      newErrors.amount = 'El monto es requerido';
+    } else if (isNaN(formData.amount) || parseFloat(formData.amount) <= 0) {
+      newErrors.amount = 'Ingrese un monto válido mayor a cero';
     }
 
-    // Crear objeto de transacción
+    if (!formData.category) {
+      newErrors.category = 'Seleccione una categoría';
+    }
+
+    if (!formData.date) {
+      newErrors.date = 'La fecha es requerida';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (!validate()) return;
+
+    // Preparar datos para guardar
+    // Crear una fecha correcta que no se desplace por zona horaria
+    const selectedDate = new Date(formData.date);
+    // Ajustar para que se guarde con la fecha correcta
+    selectedDate.setMinutes(selectedDate.getMinutes() - selectedDate.getTimezoneOffset());
+
     const transactionData = {
       ...formData,
-      amount: formData.type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
-      date: new Date(formData.date).toISOString()
+      amount: formData.type === 'expense' 
+        ? -Math.abs(parseFloat(formData.amount)) 
+        : Math.abs(parseFloat(formData.amount)),
+      date: selectedDate
     };
 
-    // Guardar transacción
-    if (transaction) {
-      onSave(transactionData);
-    } else {
-      onSave(transactionData);
-    }
-
-    // Cerrar modal
+    onSave(transactionData);
     onClose();
   };
 
@@ -97,141 +136,174 @@ const TransactionModal = ({ isOpen, onClose, transaction, categories, onSave, se
 
   return (
     <div className={styles.modalOverlay}>
-      <div className={styles.modalContent} ref={modalRef}>
+      <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>
             {transaction ? 'Editar Transacción' : 'Nueva Transacción'}
-            <span className={styles.modalDate}>
-              {format(selectedDate || new Date(), 'dd MMM yyyy')}
-            </span>
           </h2>
-          <button className={styles.modalClose} onClick={onClose}>
-            ✕
+          <button 
+            className={styles.modalClose} 
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            <CloseIcon />
           </button>
         </div>
 
         <div className={styles.modalBody}>
-          <form onSubmit={handleSubmit}>
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Tipo de Transacción</label>
-              <div className={styles.segmentedControl}>
-                <button
-                  type="button"
-                  className={`${styles.segmentButton} ${formData.type === 'expense' ? styles.segmentActive : ''}`}
-                  onClick={() => setFormData(prev => ({ ...prev, type: 'expense' }))}
-                >
-                  Gasto
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.segmentButton} ${formData.type === 'income' ? styles.segmentActive : ''}`}
-                  onClick={() => setFormData(prev => ({ ...prev, type: 'income' }))}
-                >
-                  Ingreso
-                </button>
-              </div>
+          {/* Tipo de transacción */}
+          <div className={styles.formGroup}>
+            <div className={styles.segmentedControl}>
+              <button 
+                className={`${styles.segmentButton} ${formData.type === 'expense' ? styles.segmentActive : ''}`}
+                onClick={() => handleTypeChange('expense')}
+              >
+                <RemoveIcon style={{ marginRight: '4px' }} />
+                Gasto
+              </button>
+              <button 
+                className={`${styles.segmentButton} ${formData.type === 'income' ? styles.segmentActive : ''}`}
+                onClick={() => handleTypeChange('income')}
+              >
+                <AddIcon style={{ marginRight: '4px' }} />
+                Ingreso
+              </button>
             </div>
+          </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel} htmlFor="description">
-                Descripción <span className={styles.requiredField}>*</span>
-              </label>
+          {/* Descripción */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
+              Descripción <span className={styles.requiredField}>*</span>
+            </label>
+            <div className={styles.inputWithIcon}>
               <input
                 type="text"
-                id="description"
+                className={styles.formInput}
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                className={styles.formInput}
-                placeholder="Ej. Compra de supermercado"
-                required
+                placeholder="¿En qué gastaste?"
               />
+              <div className={styles.inputIcon}>
+                <DescriptionIcon />
+              </div>
             </div>
+            {errors.description && (
+              <div className={styles.errorText}>{errors.description}</div>
+            )}
+          </div>
 
+          {/* Monto y Fecha */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div className={styles.formGroup}>
-              <label className={styles.formLabel} htmlFor="amount">
+              <label className={styles.formLabel}>
                 Monto <span className={styles.requiredField}>*</span>
               </label>
               <div className={styles.inputWithIcon}>
-                <span className={styles.inputIcon}>$</span>
                 <input
                   type="number"
-                  id="amount"
+                  className={styles.formInput}
                   name="amount"
                   value={formData.amount}
                   onChange={handleChange}
-                  className={styles.formInput}
                   placeholder="0.00"
                   step="0.01"
                   min="0"
-                  required
                 />
+                <div className={styles.inputIcon}>
+                  <AttachMoneyIcon />
+                </div>
               </div>
+              {errors.amount && (
+                <div className={styles.errorText}>{errors.amount}</div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel} htmlFor="category">
-                Categoría <span className={styles.requiredField}>*</span>
+              <label className={styles.formLabel}>
+                Fecha <span className={styles.requiredField}>*</span>
               </label>
+              <div className={styles.inputWithIcon}>
+                <input
+                  type="date"
+                  className={styles.formInput}
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                />
+                <div className={styles.inputIcon}>
+                  <EventIcon />
+                </div>
+              </div>
+              {errors.date && (
+                <div className={styles.errorText}>{errors.date}</div>
+              )}
+            </div>
+          </div>
+
+          {/* Categoría */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
+              Categoría <span className={styles.requiredField}>*</span>
+            </label>
+            <div className={styles.inputWithIcon}>
               <select
-                id="category"
+                className={styles.formSelect}
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className={styles.formSelect}
-                required
               >
-                <option value="" disabled>Selecciona una categoría</option>
-                {categories
-                  .filter(cat => formData.type === 'expense' ? !cat.isIncome : cat.isIncome)
-                  .map(category => (
-                    <option key={category.name} value={category.name}>
-                      {category.name}
-                    </option>
-                  ))
-                }
+                <option value="">Seleccionar categoría</option>
+                {categories.map((category) => (
+                  <option key={category.name} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
+              <div className={styles.inputIcon}>
+                <CategoryIcon />
+              </div>
             </div>
+            {errors.category && (
+              <div className={styles.errorText}>{errors.category}</div>
+            )}
+          </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel} htmlFor="date">
-                Fecha <span className={styles.requiredField}>*</span>
-              </label>
-              <input
-                type="date"
-                id="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className={styles.formInput}
-                required
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel} htmlFor="notes">
-                Notas
-              </label>
+          {/* Notas */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
+              Notas (opcional)
+            </label>
+            <div className={styles.inputWithIcon}>
               <textarea
-                id="notes"
+                className={styles.formTextarea}
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
-                className={styles.formTextarea}
-                placeholder="Detalles adicionales..."
-                rows="3"
-              />
+                rows={3}
+                placeholder="Agrega detalles adicionales..."
+              ></textarea>
+              <div className={styles.inputIcon} style={{ top: '12px' }}>
+                <NotesIcon />
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div className={styles.modalFooter}>
-              <button type="button" className={styles.buttonCancel} onClick={onClose}>
-                Cancelar
-              </button>
-              <button type="submit" className={styles.buttonSave}>
-                {transaction ? 'Actualizar' : 'Guardar'}
-              </button>
-            </div>
-          </form>
+        <div className={styles.modalFooter}>
+          <button 
+            className={styles.buttonCancel}
+            onClick={onClose}
+          >
+            Cancelar
+          </button>
+          <button 
+            className={styles.buttonSave}
+            onClick={handleSubmit}
+          >
+            {transaction ? 'Actualizar' : 'Agregar'}
+          </button>
         </div>
       </div>
     </div>

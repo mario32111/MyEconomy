@@ -1,12 +1,8 @@
-import { useState, useEffect} from 'react';
+// src/shared/hooks/useAuth.js
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
-import APP_CONFIG from '../config/app.config';
 
-/**
- * Hook personalizado para gestionar la autenticación
- * Proporciona funciones para login, logout, registro y verificación de estado
- */
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,21 +11,16 @@ export const useAuth = () => {
 
   // Cargar usuario al iniciar
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = () => {
       setLoading(true);
       try {
-        // Verificar token en localStorage
-        const token = localStorage.getItem(APP_CONFIG.auth.tokenKey);
-        
-        if (token) {
-          // Verificar si el token es válido
-          const userData = await authService.getCurrentUser();
+        if (authService.isAuthenticated()) {
+          const userData = authService.getCurrentUser();
           setUser(userData);
         }
       } catch (err) {
         console.error('Error al verificar autenticación:', err);
-        // Limpiar token inválido
-        localStorage.removeItem(APP_CONFIG.auth.tokenKey);
+        authService.logout();
         setUser(null);
       } finally {
         setLoading(false);
@@ -46,16 +37,13 @@ export const useAuth = () => {
     
     try {
       const response = await authService.login(email, password);
-      
-      // Guardar token
-      localStorage.setItem(APP_CONFIG.auth.tokenKey, response.token);
-      
-      // Establecer usuario
-      setUser(response.user);
-      
-      return response.user;
+      if (!response.success) {
+        throw response;
+      }
+      setUser(response.data.user);
+      return response.data.user;
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
+      setError(err.error?.message || 'Error al iniciar sesión');
       throw err;
     } finally {
       setLoading(false);
@@ -68,17 +56,13 @@ export const useAuth = () => {
     setError(null);
     
     try {
-      const response = await authService.signup(userData);
-      
-      // Guardar token si el registro también hace login
-      if (response.token) {
-        localStorage.setItem(APP_CONFIG.auth.tokenKey, response.token);
-        setUser(response.user);
+      const response = await authService.register(userData);
+      if (response.success) {
+        setUser(response.data.user);
       }
-      
       return response;
     } catch (err) {
-      setError(err.message || 'Error al registrarse');
+      setError(err.error?.message || 'Error al registrarse');
       throw err;
     } finally {
       setLoading(false);
@@ -87,14 +71,29 @@ export const useAuth = () => {
 
   // Función de logout
   const logout = () => {
-    localStorage.removeItem(APP_CONFIG.auth.tokenKey);
+    authService.logout();
     setUser(null);
     navigate('/login');
   };
-
-  // Verificar si el usuario está autenticado
-  const isAuthenticated = () => {
-    return !!user;
+  
+  // Función para actualizar datos del usuario
+  const updateUserData = async (userData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await authService.updateUserData(userData);
+      if (!response.success) {
+        throw response;
+      }
+      setUser(response.data);
+      return response;
+    } catch (err) {
+      setError(err.error?.message || 'Error al actualizar datos');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return { 
@@ -104,7 +103,8 @@ export const useAuth = () => {
     login,
     signup,
     logout,
-    isAuthenticated
+    updateUserData,
+    isAuthenticated: () => !!user
   };
 };
 

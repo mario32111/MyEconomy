@@ -1,16 +1,42 @@
 // src/features/User/Profile/components/ProfileForm.jsx
 import React, { useState, useEffect } from 'react';
 import { 
-  Box, Paper, Typography, TextField, Grid, 
-  FormControl, InputLabel, Select, MenuItem, Alert, Snackbar,
-  IconButton, Tooltip
+  Box, Typography, Grid, 
+  FormControl, InputLabel, Select, MenuItem, Alert, Snackbar, CircularProgress
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useAuth } from '../../../../shared/hooks/useAuth';
+import { updateProfile } from '../../../../shared/services/profileService';
+
+// Import global UI components
+import Card from '../../../../shared/components/UI/Card/Card';
+import Input from '../../../../shared/components/UI/Input/Input';
+import Button from '../../../../shared/components/UI/Button/Button';
+
+// Safe formatCurrency function that doesn't rely on APP_CONFIG
+const safeFormatCurrency = (amount, currency = 'MXN') => {
+  if (amount === null || amount === undefined || amount === '') {
+    return '$0.00';
+  }
+
+  try {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  } catch (error) {
+    console.error('Error formatting currency:', error);
+    return '$' + parseFloat(amount).toFixed(2);
+  }
+};
 
 const ProfileForm = ({ user, onProfileUpdate }) => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -27,44 +53,51 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
   const [originalData, setOriginalData] = useState({});
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
-  
-  // Obtener el usuario y la función para actualizar del contexto de autenticación
-  const { user: authUser, updateUserData } = useAuth();
+
+  // Obtener el usuario del contexto de autenticación
+  const { user: authUser, isAuthenticated } = useAuth();
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    // Check after a short delay to avoid flash during initial load
+    const timer = setTimeout(() => {
+      if (!isAuthenticated() && !loading) {
+        navigate('/login', { replace: true });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, navigate, loading]);
 
   // Inicializar formData con los datos del usuario
   useEffect(() => {
-    console.log("User data in ProfileForm:", { user, authUser });
-    
-    // Usar authUser si está disponible, de lo contrario usar user del prop
-    const userData = authUser || user;
-    
-    if (userData) {
+    if (user) {
       setFormData({
-        name: userData.name || '',
-        monthlyIncome: userData.monthlyIncome || '',
-        currentSavings: userData.currentSavings || '',
-        monthlyExpenses: userData.monthlyExpenses || '',
-        primaryGoal: userData.primaryGoal || '',
-        timeframe: userData.timeframe || '',
-        savingsGoal: userData.savingsGoal || '',
-        riskTolerance: userData.riskTolerance || '',
-        budgetType: userData.budgetType || '',
-        notificationPreference: userData.notificationPreference || ''
+        name: user.name || '',
+        monthlyIncome: user.monthlyIncome || '',
+        currentSavings: user.currentSavings || '',
+        monthlyExpenses: user.monthlyExpenses || '',
+        primaryGoal: user.primaryGoal || '',
+        timeframe: user.timeframe || '',
+        savingsGoal: user.savingsGoal || '',
+        riskTolerance: user.riskTolerance || '',
+        budgetType: user.budgetType || '',
+        notificationPreference: user.notificationPreference || ''
       });
       setOriginalData({
-        name: userData.name || '',
-        monthlyIncome: userData.monthlyIncome || '',
-        currentSavings: userData.currentSavings || '',
-        monthlyExpenses: userData.monthlyExpenses || '',
-        primaryGoal: userData.primaryGoal || '',
-        timeframe: userData.timeframe || '',
-        savingsGoal: userData.savingsGoal || '',
-        riskTolerance: userData.riskTolerance || '',
-        budgetType: userData.budgetType || '',
-        notificationPreference: userData.notificationPreference || ''
+        name: user.name || '',
+        monthlyIncome: user.monthlyIncome || '',
+        currentSavings: user.currentSavings || '',
+        monthlyExpenses: user.monthlyExpenses || '',
+        primaryGoal: user.primaryGoal || '',
+        timeframe: user.timeframe || '',
+        savingsGoal: user.savingsGoal || '',
+        riskTolerance: user.riskTolerance || '',
+        budgetType: user.budgetType || '',
+        notificationPreference: user.notificationPreference || ''
       });
     }
-  }, [user, authUser]);
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,28 +119,29 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
     setLoading(true);
 
     try {
-      // Actualizar los datos del usuario
-      if (updateUserData) {
-        const result = await updateUserData(formData);
-        
-        if (!result.success) {
-          throw new Error(result.error?.message || 'Error al actualizar el perfil');
-        }
-        
-        // Notificar al componente padre
-        if (onProfileUpdate) {
-          onProfileUpdate(result.data);
-        }
-      } else {
-        throw new Error('No se puede actualizar el perfil: función no disponible');
+      const userId = authUser?.id || user?.id;
+      if (!userId) {
+        throw new Error('No se pudo identificar al usuario');
       }
-      
+
+      // Actualizar perfil usando la función
+      const result = await updateProfile(userId, formData);
+
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Error al actualizar el perfil');
+      }
+
+      // Notificar al componente padre si existe
+      if (onProfileUpdate) {
+        onProfileUpdate(formData);
+      }
+
       setAlert({
         open: true,
         message: 'Perfil actualizado correctamente',
         severity: 'success'
       });
-      
+
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -129,14 +163,14 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
   const renderField = (label, name, value, type = 'text') => {
     if (isEditing) {
       return (
-        <TextField
-          fullWidth
+        <Input
           label={label}
           name={name}
           type={type}
           value={formData[name]}
           onChange={handleChange}
-          InputProps={type === 'number' ? { startAdornment: '$' } : undefined}
+          startAdornment={type === 'number' ? '$' : undefined}
+          fullWidth
         />
       );
     } else {
@@ -146,7 +180,7 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
             {label}
           </Typography>
           <Typography variant="body1">
-            {type === 'number' && formData[name] ? `$${formData[name]}` : formData[name] || 'No especificado'}
+            {type === 'number' && formData[name] ? safeFormatCurrency(formData[name]) : formData[name] || 'No especificado'}
           </Typography>
         </Box>
       );
@@ -188,68 +222,84 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
     }
   };
 
-  return (
-    <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">
-          Información Personal
+  // If not authenticated, show loading
+  if (!isAuthenticated() && !user) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+        <CircularProgress />
+        <Typography variant="body1" sx={{ ml: 2 }}>
+          Cargando...
         </Typography>
-        
-        {isEditing ? (
-          <Box>
-            <Tooltip title="Guardar cambios">
-              <IconButton 
-                color="primary" 
-                onClick={handleSubmit}
-                disabled={loading}
-              >
-                <SaveIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Cancelar">
-              <IconButton 
-                color="error" 
-                onClick={handleCancel}
-                disabled={loading}
-              >
-                <CancelIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        ) : (
-          <Tooltip title="Editar perfil">
-            <IconButton 
-              color="primary" 
-              onClick={handleEdit}
-            >
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-        )}
       </Box>
-      
+    );
+  }
+
+  // Acciones para la tarjeta
+  const cardActions = (
+    <Box>
+      {isEditing ? (
+        <>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleSubmit}
+            loading={loading}
+            startIcon={<SaveIcon />}
+            size="small"
+            sx={{ mr: 1 }}
+          >
+            Guardar
+          </Button>
+          <Button 
+            variant="outlined" 
+            color="error" 
+            onClick={handleCancel}
+            disabled={loading}
+            startIcon={<CancelIcon />}
+            size="small"
+          >
+            Cancelar
+          </Button>
+        </>
+      ) : (
+        <Button 
+          variant="outlined" 
+          color="primary" 
+          onClick={handleEdit}
+          startIcon={<EditIcon />}
+          size="small"
+        >
+          Editar
+        </Button>
+      )}
+    </Box>
+  );
+
+  return (
+    <Card
+      title="Información Financiera"
+      elevation={2}
+      rounded
+      actions={cardActions}
+    >
       <Box component={isEditing ? "form" : "div"} onSubmit={handleSubmit} noValidate>
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            {renderField('Nombre completo', 'name', formData.name)}
-          </Grid>
-          
           <Grid item xs={12} sm={6}>
             {renderField('Ingreso mensual', 'monthlyIncome', formData.monthlyIncome, 'number')}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderField('Gastos mensuales', 'monthlyExpenses', formData.monthlyExpenses, 'number')}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderField('Ahorros actuales', 'currentSavings', formData.currentSavings, 'number')}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderField('Meta de ahorro', 'savingsGoal', formData.savingsGoal, 'number')}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderSelectField('Objetivo principal', 'primaryGoal', [
               { value: 'savings', label: 'Ahorrar dinero' },
@@ -259,7 +309,7 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
               { value: 'education', label: 'Educación financiera' }
             ])}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderSelectField('Plazo de tiempo', 'timeframe', [
               { value: 'short', label: 'Corto plazo (menos de 1 año)' },
@@ -267,7 +317,7 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
               { value: 'long', label: 'Largo plazo (más de 5 años)' }
             ])}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderSelectField('Tolerancia al riesgo', 'riskTolerance', [
               { value: 'low', label: 'Baja' },
@@ -275,7 +325,7 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
               { value: 'high', label: 'Alta' }
             ])}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderSelectField('Tipo de presupuesto', 'budgetType', [
               { value: '50-30-20', label: '50/30/20 (Necesidades/Deseos/Ahorros)' },
@@ -284,7 +334,7 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
               { value: 'pay-yourself', label: 'Págate primero' }
             ])}
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             {renderSelectField('Preferencia de notificaciones', 'notificationPreference', [
               { value: 'email', label: 'Email' },
@@ -295,7 +345,7 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
           </Grid>
         </Grid>
       </Box>
-      
+
       <Snackbar 
         open={alert.open} 
         autoHideDuration={6000} 
@@ -310,7 +360,7 @@ const ProfileForm = ({ user, onProfileUpdate }) => {
           {alert.message}
         </Alert>
       </Snackbar>
-    </Paper>
+    </Card>
   );
 };
 

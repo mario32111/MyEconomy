@@ -1,0 +1,29 @@
+/* src/features/Education/styles/stability.css */
+
+/* Contenedores con dimensiones fijas */
+.progress-container {
+    min-height: 400px !important;
+    position: relative !important;
+  }
+  
+  .tree-container {
+    min-height: 300px !important;
+    position: relative !important;
+  }
+  
+  .tab-content {
+    min-height: 350px !important;
+    position: relative !important;
+  }
+  
+  /* Imágenes con dimensiones fijas */
+  .fixed-image {
+    width: 100% !important;
+    height: 200px !important;
+    object-fit: contain !important;
+  }
+  
+  /* Evitar saltos en tipografía */
+  body {
+    font-display: swap !important;
+  }

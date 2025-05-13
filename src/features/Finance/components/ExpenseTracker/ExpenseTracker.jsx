@@ -3,9 +3,81 @@ import { useExpenseTrackerLogic } from './ExpenseTrackerLogic';
 import TransactionModal from './TransactionModal';
 import VoiceInputModal from './VoiceInputModal';
 import GeneralGraph from './GeneralGraph';
-import { format } from 'date-fns';
+import { format, getDaysInMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
 import styles from './ExpenseTracker.module.css';
+// Importaciones de Material UI
+import AddIcon from '@mui/icons-material/Add';
+import MicIcon from '@mui/icons-material/Mic';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import SavingsIcon from '@mui/icons-material/Savings';
+// Importación corregida para formatters
+import { formatCurrency } from '../../../../shared/utils/formatters';
+
+// Mini componente para mostrar estadísticas
+const StatCard = ({ title, value, icon, color, trend }) => (
+  <div className={styles.statCard}>
+    <div className={styles.statIcon} style={{ backgroundColor: `${color}20`, color }}>
+      {icon}
+    </div>
+    <div className={styles.statInfo}>
+      <div className={styles.statTitle}>{title}</div>
+      <div className={styles.statValue}>{value}</div>
+      {trend && <div className={styles.statTrend} style={{ color }}>{trend}</div>}
+    </div>
+  </div>
+);
+
+// Mini componente para la gráfica de barras
+const MiniBarChart = ({ income, expense }) => {
+  const total = Math.abs(income) + Math.abs(expense);
+  const incomePercent = total > 0 ? (Math.abs(income) / total) * 100 : 0;
+  const expensePercent = total > 0 ? (Math.abs(expense) / total) * 100 : 0;
+
+  return (
+    <div className={styles.miniBarChart}>
+      <div className={styles.chartTitle}>Resumen del Mes</div>
+      <div className={styles.barContainer}>
+        <div className={styles.barLabel}>
+          <span>Ingresos</span>
+          <span>{formatCurrency(income)}</span>
+        </div>
+        <div className={styles.barWrapper}>
+          <div 
+            className={styles.barIncome} 
+            style={{ width: `${incomePercent}%` }}
+          ></div>
+        </div>
+      </div>
+      <div className={styles.barContainer}>
+        <div className={styles.barLabel}>
+          <span>Gastos</span>
+          <span>{formatCurrency(Math.abs(expense))}</span>
+        </div>
+        <div className={styles.barWrapper}>
+          <div 
+            className={styles.barExpense} 
+            style={{ width: `${expensePercent}%` }}
+          ></div>
+        </div>
+      </div>
+      <div className={styles.barContainer}>
+        <div className={styles.barLabel}>
+          <span>Balance</span>
+          <span style={{ color: income + expense >= 0 ? '#10b981' : '#ef4444' }}>
+            {formatCurrency(income + expense)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ExpenseTracker = () => {
   const {
@@ -30,6 +102,52 @@ const ExpenseTracker = () => {
 
   const { chartData, totalExpense } = calculateTotals();
 
+  // Calcular estadísticas adicionales
+  const calculateStats = () => {
+    // Obtener todas las transacciones del localStorage
+    const savedTransactions = localStorage.getItem('transactions');
+    const allTransactions = savedTransactions ? JSON.parse(savedTransactions) : [];
+
+    // Obtener el mes actual
+    const currentMonth = selectedDate.getMonth();
+    const currentYear = selectedDate.getFullYear();
+
+    // Filtrar transacciones del mes actual
+    const monthTransactions = allTransactions.filter(transaction => {
+      const transDate = new Date(transaction.date);
+      return transDate.getMonth() === currentMonth && 
+             transDate.getFullYear() === currentYear;
+    });
+
+    // Calcular ingresos y gastos del mes
+    const monthIncome = monthTransactions
+      .filter(t => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const monthExpense = monthTransactions
+      .filter(t => t.amount < 0)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    // Calcular gasto diario recomendado
+    const daysInMonth = getDaysInMonth(selectedDate);
+    const remainingDays = daysInMonth - selectedDate.getDate() + 1;
+    const dailyBudget = (monthIncome + monthExpense) / remainingDays;
+
+    // Calcular ahorro potencial
+    const currentDayOfMonth = selectedDate.getDate();
+    const projectedExpense = (Math.abs(monthExpense) / currentDayOfMonth) * daysInMonth;
+    const potentialSavings = monthIncome - projectedExpense;
+
+    return {
+      monthIncome,
+      monthExpense,
+      dailyBudget: dailyBudget > 0 ? dailyBudget : 0,
+      potentialSavings: potentialSavings > 0 ? potentialSavings : 0
+    };
+  };
+
+  const stats = calculateStats();
+
   if (isLoading) {
     return (
       <div className={styles.loadingSpinner}>
@@ -50,6 +168,29 @@ const ExpenseTracker = () => {
 
   return (
     <div className={styles.expenseTrackerContainer}>
+      {/* Stats Row */}
+      <div className={styles.statsRow}>
+        <StatCard 
+          title="Gasto Diario Recomendado" 
+          value={formatCurrency(stats.dailyBudget)}
+          icon={<TrendingDownIcon />}
+          color="#3b82f6"
+        />
+        <StatCard 
+          title="Ahorro Potencial" 
+          value={formatCurrency(stats.potentialSavings)}
+          icon={<SavingsIcon />}
+          color="#10b981"
+          trend="Si mantienes este ritmo de gastos"
+        />
+        <StatCard 
+          title="Balance del Mes" 
+          value={formatCurrency(stats.monthIncome + stats.monthExpense)}
+          icon={<TrendingUpIcon />}
+          color={stats.monthIncome + stats.monthExpense >= 0 ? "#10b981" : "#ef4444"}
+        />
+      </div>
+
       <div className={styles.gridLayout}>
         {/* Left column - Chart */}
         <div className={styles.chartColumn}>
@@ -65,9 +206,7 @@ const ExpenseTracker = () => {
                     setSelectedDate(newDate);
                   }}
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <ArrowBackIosNewIcon fontSize="small" />
                 </button>
 
                 <div 
@@ -80,12 +219,7 @@ const ExpenseTracker = () => {
                   }}
                 >
                   <div className={styles.calendarIcon}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                      <path d="M16 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      <path d="M8 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      <path d="M3 10H21" stroke="currentColor" strokeWidth="2"/>
-                    </svg>
+                    <CalendarTodayIcon />
                   </div>
                   <div className={styles.selectedDate}>
                     {format(selectedDate, 'dd MMM yyyy', { locale: es })}
@@ -109,9 +243,7 @@ const ExpenseTracker = () => {
                     setSelectedDate(newDate);
                   }}
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <ArrowForwardIosIcon fontSize="small" />
                 </button>
               </div>
             </div>
@@ -128,6 +260,12 @@ const ExpenseTracker = () => {
                 </div>
               )}
             </div>
+
+            {/* Mini Bar Chart */}
+            <MiniBarChart 
+              income={stats.monthIncome} 
+              expense={stats.monthExpense} 
+            />
           </div>
         </div>
 
@@ -143,21 +281,17 @@ const ExpenseTracker = () => {
               </div>
               <div className={styles.transactionActions}>
                 <button 
-                  onClick={openVoiceModal} 
-                  className={`${styles.button} ${styles.buttonBlue}`}
+                  className={styles.buttonOutlined}
+                  onClick={openVoiceModal}
                 >
-                  <svg className={styles.buttonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                  </svg>
+                  <MicIcon style={{ marginRight: '4px' }} />
                   Voz
                 </button>
                 <button 
-                  onClick={() => openModal()} 
-                  className={`${styles.button} ${styles.buttonGreen}`}
+                  className={styles.buttonPrimary}
+                  onClick={() => openModal()}
                 >
-                  <svg className={styles.buttonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
+                  <AddIcon style={{ marginRight: '4px' }} />
                   Agregar
                 </button>
               </div>
@@ -172,10 +306,11 @@ const ExpenseTracker = () => {
                   No se encontraron transacciones en el período seleccionado. Agrega una nueva transacción para comenzar.
                 </p>
                 <button 
-                  onClick={() => openModal()} 
-                  className={`${styles.button} ${styles.buttonBlue}`}
+                  className={styles.buttonPrimary}
+                  onClick={() => openModal()}
                   style={{ marginTop: '1.5rem' }}
                 >
+                  <AddIcon style={{ marginRight: '4px' }} />
                   Agregar transacción
                 </button>
               </div>
@@ -228,9 +363,7 @@ const ExpenseTracker = () => {
                               className={`${styles.actionButton} ${styles.actionButtonEdit}`}
                               title="Editar"
                             >
-                              <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                              </svg>
+                              <EditIcon style={{ width: '1.25rem', height: '1.25rem' }} />
                             </button>
                             <button 
                               onClick={() => {
@@ -241,9 +374,7 @@ const ExpenseTracker = () => {
                               className={`${styles.actionButton} ${styles.actionButtonDelete}`}
                               title="Eliminar"
                             >
-                              <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                              </svg>
+                              <DeleteIcon style={{ width: '1.25rem', height: '1.25rem' }} />
                             </button>
                           </div>
                         </td>

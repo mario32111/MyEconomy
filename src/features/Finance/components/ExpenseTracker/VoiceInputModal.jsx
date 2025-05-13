@@ -1,41 +1,153 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './ExpenseTracker.module.css';
 
 const VoiceInputModal = ({ isOpen, onClose, onSave, categories }) => {
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [finalTranscription, setFinalTranscription] = useState('');
+  const [interimTranscription, setInterimTranscription] = useState('');
   const [parsedData, setParsedData] = useState(null);
   const [error, setError] = useState(null);
+  const recognitionRef = useRef(null);
   
-  // Simulación de reconocimiento de voz
+  // Configuración del reconocimiento de voz
   useEffect(() => {
-    if (!isListening) return;
-    
-    // Simulamos el reconocimiento de voz
-    const timer = setTimeout(() => {
-      setTranscript('Compra de supermercado por 120 pesos en categoría comida');
-      setIsListening(false);
+    if ("webkitSpeechRecognition" in window && !recognitionRef.current) {
+      const SpeechRecognition = window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = "es-ES";
       
-      // Simulamos el análisis del texto
-      setParsedData({
-        description: 'Compra de supermercado',
-        amount: 120,
-        category: 'Comida',
-        date: new Date().toISOString().split('T')[0]
-      });
-    }, 3000);
-    
-    return () => clearTimeout(timer);
+      recognitionRef.current.onresult = (event) => {
+        let interim = "";
+        let final = "";
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            const processedText = processSpokenText(event.results[i][0].transcript);
+            final += processedText + " ";
+            
+            // Extraer información de la transcripción
+            const extractedData = extractTransactionData(processedText);
+            if (extractedData) {
+              setParsedData(extractedData);
+            }
+          } else {
+            interim += processSpokenText(event.results[i][0].transcript);
+          }
+        }
+        
+        if (final) {
+          setFinalTranscription((prev) => prev + final);
+        }
+        setInterimTranscription(interim);
+      };
+      
+      recognitionRef.current.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+        setError("Error en el reconocimiento de voz. Intenta de nuevo.");
+      };
+      
+      recognitionRef.current.onend = () => {
+        if (isListening) {
+          try {
+            recognitionRef.current.start();
+          } catch (error) {
+            console.error("Failed to restart recognition:", error);
+            setIsListening(false);
+            setError("Error al reiniciar el reconocimiento de voz.");
+          }
+        }
+      };
+    } else if (!("webkitSpeechRecognition" in window)) {
+      setError("El reconocimiento de voz no es compatible con este navegador. Por favor, usa Google Chrome.");
+    }
   }, [isListening]);
   
+  // Procesar texto hablado
+  const processSpokenText = (text) => {
+    const replacements = {
+      uno: "1", dos: "2", tres: "3", cuatro: "4", cinco: "5", 
+      seis: "6", siete: "7", ocho: "8", nueve: "9", cero: "0", 
+      coma: ",", punto: ".", "punto y coma": ";",
+    };
+    
+    return text
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .map((word) => replacements[word] || word)
+      .join(" ");
+  };
+  
+  // Extraer datos de transacción del texto
+  const extractTransactionData = (text) => {
+    const predefinedCategories = [
+      "Restaurante", "Transporte", "Renta", "Servicios", 
+      "Entretenimiento", "Comida", "Supermercado"
+    ];
+    
+    // Buscar patrones como "120 pesos en comida" o "compra de supermercado por 120 pesos"
+    const categoryRegex = /(?:\$?(\d+(?:\.\d{1,2})?)\s*(?:pesos|))\s*(?:en|para|de)\s*([\w\s]+)(?:\s+(porque|ya que|por|debido a)\s+(.+))?/gi;
+    const purchaseRegex = /(?:compra|gasto|pago)\s+(?:de|en|por)\s+([\w\s]+)\s+(?:por|de)\s+\$?(\d+(?:\.\d{1,2})?)\s*(?:pesos|)/gi;
+    
+    let match;
+    
+    // Intentar con el primer patrón
+    while ((match = categoryRegex.exec(text)) !== null) {
+      const [, amount, rawCategory] = match;
+      let detectedCategory = predefinedCategories.find((category) =>
+        rawCategory.toLowerCase().includes(category.toLowerCase())
+      ) || "Otra";
+      
+      return {
+        description: `Gasto en ${rawCategory.trim()}`,
+        amount: parseFloat(amount),
+        category: detectedCategory,
+        date: new Date().toISOString().split('T')[0]
+      };
+    }
+    
+    // Intentar con el segundo patrón
+    while ((match = purchaseRegex.exec(text)) !== null) {
+      const [, description, amount] = match;
+      let detectedCategory = predefinedCategories.find((category) =>
+        description.toLowerCase().includes(category.toLowerCase())
+      ) || "Otra";
+      
+      return {
+        description: description.trim(),
+        amount: parseFloat(amount),
+        category: detectedCategory,
+        date: new Date().toISOString().split('T')[0]
+      };
+    }
+    
+    return null;
+  };
+  
   const startListening = () => {
+    if (!recognitionRef.current) return;
+    
     setError(null);
-    setTranscript('');
+    setFinalTranscription('');
+    setInterimTranscription('');
     setParsedData(null);
-    setIsListening(true);
+    
+    try {
+      recognitionRef.current.start();
+      setIsListening(true);
+    } catch (error) {
+      console.error("Failed to start recognition:", error);
+      setError("Error al iniciar el reconocimiento de voz.");
+    }
   };
   
   const stopListening = () => {
+    if (!recognitionRef.current) return;
+    
+    recognitionRef.current.stop();
     setIsListening(false);
   };
   
@@ -48,7 +160,7 @@ const VoiceInputModal = ({ isOpen, onClose, onSave, categories }) => {
         amount: -parsedData.amount, // Negativo para gastos
         date: parsedData.date,
         category: parsedData.category,
-        notes: `Agregado por voz: "${transcript}"`
+        notes: `Agregado por voz: "${finalTranscription.trim()}"`
       });
       
       onClose();
@@ -59,6 +171,8 @@ const VoiceInputModal = ({ isOpen, onClose, onSave, categories }) => {
   };
   
   if (!isOpen) return null;
+  
+  const transcript = finalTranscription + interimTranscription;
   
   return (
     <div className={styles.modalOverlay}>
@@ -88,7 +202,10 @@ const VoiceInputModal = ({ isOpen, onClose, onSave, categories }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto'
+                margin: '0 auto',
+                backgroundColor: isListening ? '#ff4d4d' : '#4caf50',
+                color: '#fff',
+                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
               }}
             >
               {isListening ? (
@@ -114,10 +231,23 @@ const VoiceInputModal = ({ isOpen, onClose, onSave, categories }) => {
                   padding: '1rem', 
                   backgroundColor: '#f3f4f6', 
                   borderRadius: '0.375rem',
-                  fontSize: '0.875rem'
+                  fontSize: '0.875rem',
+                  position: 'relative'
                 }}
               >
                 {transcript}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '10px',
+                    right: '10px',
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: isListening ? '#4caf50' : '#ccc',
+                    animation: isListening ? 'blink 1s infinite' : 'none',
+                  }}
+                />
               </div>
             </div>
           )}

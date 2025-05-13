@@ -1,23 +1,17 @@
 // backend/config/supabaseClient.js
-require('dotenv').config(); // Asegura que las variables de .env se carguen
 const { createClient } = require('@supabase/supabase-js');
+const dotenv = require('dotenv');
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+dotenv.config();
 
-let supabase = null;
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    '⚠️ Advertencia: SUPABASE_URL o SUPABASE_ANON_KEY no están configuradas en .env. La integración con Supabase Auth estará deshabilitada.'
-  );
-} else {
-  try {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
-    console.log('Cliente Supabase inicializado correctamente.');
-  } catch (error) {
-    console.error('Error al inicializar el cliente Supabase:', error);
-  }
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Faltan variables de entorno de Supabase');
+  process.exit(1);
 }
 
-module.exports = supabase; // Exporta el cliente inicializado (o null si falló o no hay credenciales)
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+module.exports = supabase;

@@ -154,28 +154,28 @@ const LandingPage = () => {
       step: 1,
       title: "Regístrate gratis",
       description: "Crea tu cuenta en menos de 2 minutos y comienza a explorar todas las funcionalidades.",
-      image: images[0],
+      image: images[4],
       color: theme.palette.primary.main
     },
     {
       step: 2,
       title: "Conecta tus cuentas",
       description: "Vincula tus cuentas bancarias de forma segura para sincronizar automáticamente tus transacciones.",
-      image: images[1],
+      image: images[3],
       color: theme.palette.secondary.main
     },
     {
       step: 3,
       title: "Analiza tus finanzas",
       description: "Visualiza gráficos y reportes detallados para entender mejor tus hábitos financieros.",
-      image: images[2],
+      image: images[5],
       color: theme.palette.success.main
     },
     {
       step: 4,
       title: "Mejora tu economía",
       description: "Recibe recomendaciones personalizadas y establece metas para optimizar tus finanzas.",
-      image: images[4],
+      image: images[2],
       color: theme.palette.info.main
     }
   ];
@@ -505,9 +505,6 @@ const LandingPage = () => {
                           e.target.style.display = 'none';
                         }}
                       />
-                    <img
-                        src={item.image}
-                    />
                     </Box>
                   </motion.div>
                 </Grid>

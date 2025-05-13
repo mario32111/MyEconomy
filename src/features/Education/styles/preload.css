@@ -1,0 +1,23 @@
+/* Estilos para prevenir CLS */
+.tree-container {
+    min-height: 250px;
+    position: relative;
+  }
+  
+  .progress-container {
+    min-height: 500px;
+  }
+  
+  .tab-content {
+    min-height: 400px;
+  }
+  
+  /* Precargar fuentes críticas */
+  body {
+    font-display: swap;
+  }
+  
+  /* Reservar espacio para imágenes */
+  img {
+    aspect-ratio: attr(width) / attr(height);
+  }

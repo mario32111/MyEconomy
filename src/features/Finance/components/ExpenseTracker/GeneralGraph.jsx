@@ -1,123 +1,126 @@
 // src/features/Finance/components/ExpenseTracker/GeneralGraph.jsx
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { formatCurrency } from '../../../../shared/utils/formatters';
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name, value }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  // Only show label if percentage is significant enough (> 5%)
+  if (percent < 0.05) return null;
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="white" 
+      textAnchor={x > cx ? 'start' : 'end'} 
+      dominantBaseline="central"
+      fontSize={12}
+      fontWeight="bold"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ 
+        backgroundColor: '#fff', 
+        padding: '10px', 
+        border: '1px solid #ccc',
+        borderRadius: '4px',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+      }}>
+        <p style={{ 
+          margin: 0, 
+          color: payload[0].payload.color,
+          fontWeight: 'bold' 
+        }}>
+          {payload[0].name}
+        </p>
+        <p style={{ margin: '5px 0 0' }}>
+          <span style={{ fontWeight: 'bold' }}>
+            {formatCurrency(payload[0].value)}
+          </span>
+          <span style={{ marginLeft: '5px', fontSize: '12px', color: '#666' }}>
+            ({payload[0].payload.percentage})
+          </span>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 const GeneralGraph = ({ data, totalAmount }) => {
+  // If no data or empty data, return a message
   if (!data || data.length === 0) {
     return (
       <div style={{ 
-        height: '100%', 
         display: 'flex', 
+        justifyContent: 'center', 
         alignItems: 'center', 
-        justifyContent: 'center',
+        height: '100%',
         color: '#6b7280',
         flexDirection: 'column'
       }}>
-        <p>No hay datos para mostrar</p>
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p style={{ marginTop: '1rem' }}>No hay datos para mostrar</p>
       </div>
     );
   }
 
-  // Ordenar los datos por valor (de mayor a menor)
-  const sortedData = [...data].sort((a, b) => b.value - a.value);
-
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div style={{ 
-          backgroundColor: '#fff', 
-          padding: '10px', 
-          border: '1px solid #ccc',
-          borderRadius: '4px',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-        }}>
-          <p style={{ margin: 0, fontWeight: 'bold', color: data.color }}>
-            {data.name}
-          </p>
-          <p style={{ margin: '5px 0 0' }}>
-            ${data.value.toFixed(2)} ({data.percentage})
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const CustomLegend = ({ payload }) => {
-    return (
-      <ul style={{ 
-        listStyle: 'none', 
-        padding: 0, 
-        margin: 0,
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: '8px'
-      }}>
-        {payload.map((entry, index) => (
-          <li key={`item-${index}`} style={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            marginBottom: '5px',
-            backgroundColor: '#f3f4f6',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px'
-          }}>
-            <div style={{ 
-              width: '10px', 
-              height: '10px', 
-              backgroundColor: entry.color,
-              marginRight: '5px',
-              borderRadius: '50%'
-            }} />
-            <span>{entry.value} ({entry.payload.percentage})</span>
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={sortedData}
+            data={data}
             cx="50%"
             cy="50%"
             labelLine={false}
+            label={renderCustomizedLabel}
             outerRadius={80}
-            innerRadius={60}
             fill="#8884d8"
             dataKey="value"
+            nameKey="name"
           >
-            {sortedData.map((entry, index) => (
+            {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend content={<CustomLegend />} />
+          <Legend 
+            layout="vertical" 
+            verticalAlign="middle" 
+            align="right"
+            formatter={(value, entry, index) => {
+              return (
+                <span style={{ color: entry.color, fontWeight: 500 }}>
+                  {value} ({entry.payload.percentage})
+                </span>
+              );
+            }}
+          />
         </PieChart>
       </ResponsiveContainer>
-      
-      {/* Total en el centro */}
       <div style={{ 
-        position: 'absolute', 
-        top: '50%', 
-        left: '50%', 
-        transform: 'translate(-50%, -50%)',
-        textAlign: 'center'
+        textAlign: 'center', 
+        marginTop: '1rem',
+        fontWeight: 'bold',
+        fontSize: '1.25rem'
       }}>
-        <div style={{ fontSize: '14px', color: '#6b7280' }}>Total</div>
-        <div style={{ 
-          fontSize: '20px', 
-          fontWeight: 'bold',
-          color: '#1f2937'
-        }}>
-          ${totalAmount.toFixed(2)}
-        </div>
+        Total: {formatCurrency(totalAmount)}
       </div>
     </div>
   );
