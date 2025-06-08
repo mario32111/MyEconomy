@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkmyeconomy=self.webpackChunkmyeconomy||[]).push([[866],{86866:(e,t,n)=>{n.r(t),n.d(t,{default:()=>s});var r=n(65043),o=n(70579);const s=()=>{const[e,t]=(0,r.useState)("");return(0,r.useEffect)((()=>{fetch("/landing/index.html").then((e=>{if(!e.ok)throw new Error("Network response was not ok");return e.text()})).then((e=>{t(e)})).catch((e=>{console.error("There was a problem with the fetch operation:",e)}))}),[]),(0,o.jsx)("div",{dangerouslySetInnerHTML:{__html:e}})}}}]);
+//# sourceMappingURL=866.4d51af90.chunk.js.map
